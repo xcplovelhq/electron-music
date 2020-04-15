@@ -9,7 +9,6 @@ import VueAwesomeSwiper from "vue-awesome-swiper";
 import Moment from "moment";
 // require styles
 import "swiper/css/swiper.css";
-require("moment-precise-range-plugin");
 Vue.use(VueAwesomeSwiper);
 Vue.prototype.$moment = Moment;
 // import debug from "electron-debug";

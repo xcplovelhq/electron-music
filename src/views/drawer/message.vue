@@ -7,11 +7,17 @@
     ></Loading>
     <div class="m-message" v-else>
       <ul>
-        <li v-for="item in messageList" :key="item.id">
+        <li
+          v-for="item in messageList"
+          :key="item.id"
+          :class="{ active: name === '评论' || name === '@我' }"
+        >
           <Avata
             :ImgUrl="
               (item.fromUser && item.fromUser.avatarUrl) ||
-                getAvatarual(item).user.avatarUrl
+                (item.notice && item.notice.user.avatarUrl) ||
+                (item.user && item.user.avatarUrl) ||
+                (item.json && item.json.comment.user.avatarUrl)
             "
             Size="35"
             style="min-width: 35px"
@@ -21,12 +27,46 @@
               <div class="m-name">
                 {{
                   (item.fromUser && item.fromUser.nickname) ||
-                    getAvatarual(item).user.nickname
+                    (item.notice && item.notice.user.nickname) ||
+                    (item.user && item.user.nickname) ||
+                    (item.json && item.json.comment.user.nickname)
                 }}
               </div>
+              <div class="m-time">{{ getTime(item) }}</div>
             </div>
-            <div class="m-text">
-              {{ getText(item) }}
+            <div class="m-text" v-html="getText(item)"></div>
+            <div class="m-reply" v-if="name === '评论' || name === '@我'">
+              <template v-if="name === '评论'">
+                {{ item.beRepliedContent }}
+              </template>
+              <template v-else>
+                <Avata
+                  :ImgUrl="
+                    item.json &&
+                      (item.json.resource.coverImgUrl ||
+                        item.json.resource.album.picUrl)
+                  "
+                  Size="40"
+                  Radius="8"
+                  style="min-width: 35px"
+                ></Avata>
+                <div class="m-reply-info">
+                  <h3>{{ item.json.resource.name }}</h3>
+                  <p v-if="item.json.resource.creator">
+                    by {{ item.json.resource.creator.nickname }}
+                  </p>
+                  <p
+                    v-else-if="
+                      item.json.resource.artists &&
+                        item.json.resource.artists.length > 0
+                    "
+                  >
+                    <template v-for="v in item.json.resource.artists">
+                      {{ v.name }}
+                    </template>
+                  </p>
+                </div>
+              </template>
             </div>
           </div>
         </li>
@@ -46,12 +86,12 @@ export default {
     Avata,
     Loading
   },
-  data() {
+  data () {
     return {
       showTips: false,
       limit: 20,
       messageList: [],
-      name: "",
+      name: "私信",
       tabList: [
         {
           isActive: true,
@@ -73,28 +113,89 @@ export default {
       ]
     };
   },
-  created() {
+  created () {
     this.getMsgProvate();
   },
   methods: {
-    getText(item) {
-      let lastMsg = JSON.parse(item.lastMsg || item.notice);
-      if (lastMsg.track) {
-        return `我分享了单曲「${JSON.parse(lastMsg.track.json).song.name}」`;
-      } else {
-        return (
-          ((lastMsg.promotionUrl && lastMsg.promotionUrl.text + "：") || "") +
-          lastMsg.msg
-        );
-      }
-    },
-    getAvatarual(item) {
-      let notice = JSON.parse(item.notice);
-      console.log(notice);
+    getText (item) {
+      let text = "";
+      let content = "";
+      let regName = /@(\S*)/;
+      let regText = /([^\s]+)$/;
 
-      return notice;
+      switch (this.name) {
+        case "私信":
+          if (item.lastMsg.msg) {
+            text =
+              ((item.lastMsg.promotionUrl &&
+                item.lastMsg.promotionUrl.text + "：") ||
+                "") + item.lastMsg.msg;
+          } else {
+            text = item.lastMsg.title;
+          }
+          break;
+
+        case "评论":
+          if (regName.test(item.content)) {
+            content = `<a>${item.content.match(regName)[0]}</a> ${
+              item.content.match(regText)[0]
+              }`;
+          } else {
+            content = item.content;
+          }
+          if (item.beRepliedUser) {
+            text = "回复我：" + content;
+          } else {
+            text = content;
+          }
+          break;
+
+        case "@我":
+          if (regName.test(item.json.comment.content)) {
+            text = `评价：<a>${
+              item.json.comment.content.match(regName)[0]
+              }</a> ${item.json.comment.content.match(regText)[0]}`;
+          } else {
+            text = "评价：" + item.json.comment.content;
+          }
+          break;
+
+        case "通知":
+          text = `我分享了单曲「${
+            JSON.parse(item.notice.track.json).song.name
+            }」`;
+          break;
+
+        default:
+          break;
+      }
+      return text;
     },
-    getTabIndex(name) {
+    getTime (item) {
+      let time = "";
+      let timeData = "";
+      let timeNow = this.$moment();
+      if (this.name === "私信") {
+        timeData = this.$moment(item.lastMsgTime);
+      } else {
+        timeData = this.$moment(item.time);
+      }
+
+      if (timeNow.format("YYYYMMDD") == timeData.format("YYYYMMDD")) {
+        time = timeData.format("kk:mm");
+      } else if (
+        timeNow.subtract(1, "days").format("YYYYMMDD") ==
+        timeData.format("YYYYMMDD")
+      ) {
+        time = timeData.format("昨天 kk:mm");
+      } else if (timeNow.format("YYYY") == timeData.format("YYYY")) {
+        time = timeData.format("M月DD日");
+      } else {
+        time = timeData.format("YYYY年M月DD日");
+      }
+      return time;
+    },
+    getTabIndex (name) {
       this.messageList = [];
       this.showTips = false;
       this.tabList.forEach(item => {
@@ -121,18 +222,22 @@ export default {
         }
       });
     },
-    getMsgProvate() {
+    getMsgProvate () {
       this.$api.userData.getMsgProvate({}).then(({ data }) => {
         if (data.msgs && data.msgs.length > 0) {
-          console.log("321321");
-
           this.messageList = data.msgs;
+          this.tabList[0].badge = data.newMsgCount;
+          this.messageList.forEach(item => {
+            if (item.lastMsg) {
+              item.lastMsg = JSON.parse(item.lastMsg);
+            }
+          });
         } else {
           this.showTips = true;
         }
       });
     },
-    getMsgComments() {
+    getMsgComments () {
       this.$api.userData
         .getMsgComments({
           uid: this.$store.state.User.userInfo.userId
@@ -140,24 +245,40 @@ export default {
         .then(({ data }) => {
           if (data.comments && data.comments.length > 0) {
             this.messageList = data.comments;
+            this.tabList[1].badge = data.newCount;
           } else {
             this.showTips = true;
           }
         });
     },
-    getMsgForwards() {
+    getMsgForwards () {
       this.$api.userData.getMsgForwards({}).then(({ data }) => {
         if (data.forwards && data.forwards.length > 0) {
           this.messageList = data.forwards;
+          this.tabList[2].badge = data.newCount;
+
+          this.messageList.forEach(item => {
+            if (item.json) {
+              item.json = JSON.parse(item.json);
+            }
+          });
+          console.log(this.messageList);
         } else {
           this.showTips = true;
         }
       });
     },
-    getMsgNotices() {
+    getMsgNotices () {
       this.$api.userData.getMsgNotices({}).then(({ data }) => {
         if (data.notices && data.notices.length > 0) {
           this.messageList = data.notices;
+          this.tabList[3].badge = data.newCount;
+
+          this.messageList.forEach(item => {
+            if (item.notice) {
+              item.notice = JSON.parse(item.notice);
+            }
+          });
         } else {
           this.showTips = true;
         }
@@ -186,14 +307,25 @@ export default {
       &:hover {
         background: #f6f6f7;
       }
+      &.active:hover {
+        background: #fff;
+      }
       .m-info {
-        cursor: pointer;
+        width: 100%;
         margin-left: 6px;
         padding-bottom: 10px;
         border-bottom: 1px solid #fafafa;
+        cursor: pointer;
         .m-title {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
           font-size: 13px;
           color: #607cac;
+        }
+        .m-time {
+          font-size: 12px;
+          color: #c9cfcf;
         }
         .m-text {
           font-size: 12px;
@@ -202,6 +334,26 @@ export default {
           display: -webkit-box;
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
+        }
+        .m-reply {
+          display: flex;
+          margin-top: 10px;
+          padding: 10px;
+          background: #f5f5f5;
+          border-radius: 8px;
+          font-size: 12px;
+          &:hover {
+            background: #eee;
+          }
+          .m-reply-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-left: 10px;
+            p {
+              color: #8e8e8e;
+            }
+          }
         }
       }
     }

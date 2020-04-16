@@ -11,15 +11,17 @@
         </transition>
         <el-drawer
           :visible="isShowDrawer"
+          :class="{ 'el-drawer__wrapper_playing': getDrawerType == 'playing' }"
           @open="handleOpen"
           @close="handleClose"
           :withHeader="false"
           :modal="false"
-          size="420px"
-          direction="rtl"
+          :size="getDrawerType != 'playing' ? '420px' : '100%'"
+          :direction="getDrawerType != 'playing' ? 'rtl' : 'btt'"
         >
           <play-list v-if="getDrawerType === 'playList'"></play-list>
           <message v-else-if="getDrawerType === 'message'"></message>
+          <playing v-else-if="getDrawerType === 'playing'"></playing>
         </el-drawer>
       </div>
     </div>
@@ -33,37 +35,38 @@ import GNav from "@/components/common/Nav";
 import GFooterPlay from "@/components/common/FooterPlay";
 import PlayList from "@/views/drawer/drawer-play-list";
 import Message from "@/views/drawer/message";
+import Playing from "@/views/drawer/playing";
 
 import { getStorage } from "@/lib/store";
 
 export default {
   name: "home",
-  components: { GHeader, GNav, GFooterPlay, PlayList, Message },
-  data() {
+  components: { GHeader, GNav, GFooterPlay, PlayList, Message, Playing },
+  data () {
     return {};
   },
-  created() {
+  created () {
     console.log(getStorage());
     // deleteStorage("playList");
   },
   computed: {
-    key() {
+    key () {
       return this.$route.name
         ? this.$route.name + +new Date()
         : this.$route + +new Date();
     },
-    isShowDrawer() {
+    isShowDrawer () {
       return this.$store.state.isShowDrawer;
     },
-    getDrawerType() {
+    getDrawerType () {
       return this.$store.state.drawerType;
     }
   },
   methods: {
-    handleOpen() {
+    handleOpen () {
       this.$store.commit("CHANGE_DRAWER_STATUS", true);
     },
-    handleClose() {
+    handleClose () {
       this.$store.commit("CHANGE_DRAWER_STATUS", false);
     }
   }
@@ -83,6 +86,12 @@ export default {
   .el-drawer__wrapper {
     top: 50px;
     bottom: 60px;
+    &.el-drawer__wrapper_playing {
+      top: 0;
+      .el-drawer {
+        background: #f8f7f8;
+      }
+    }
     .el-drawer:focus {
       border: 0;
     }

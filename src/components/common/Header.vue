@@ -27,7 +27,10 @@
           >最新音乐</router-link
         >
       </div>
-      <div class="flex-justify-end">
+      <div
+        class="flex-justify-end"
+        :class="{ 'z-playing': getDrawerType == 'playing' && isShowDrawer }"
+      >
         <g-search></g-search>
         <div class="m-menu">
           <div class="m-setting"><i class="iconfont">&#xe61f;</i></div>
@@ -52,27 +55,33 @@ export default {
   },
 
   computed: {
-    getMessageIdx() {
+    getMessageIdx () {
       return this.$store.state.User.messageIndex;
+    },
+    getDrawerType () {
+      return this.$store.state.drawerType;
+    },
+    isShowDrawer () {
+      return this.$store.state.isShowDrawer;
     }
   },
-  created() {
+  created () {
     this.getMsgProvate();
   },
   methods: {
-    handleRouter(type) {
+    handleRouter (type) {
       if (type === "back") {
         this.$router.back();
       }
     },
-    handleMessage() {
+    handleMessage () {
       this.$store.commit("SET_DRAWER_TYPE", "message");
       this.$store.commit(
         "CHANGE_DRAWER_STATUS",
         !this.$store.state.isShowDrawer
       );
     },
-    getMsgProvate() {
+    getMsgProvate () {
       this.$store.dispatch("getMsgProvate");
     }
   }
@@ -142,6 +151,31 @@ export default {
         }
         &:hover {
           opacity: 1;
+        }
+      }
+    }
+    .flex-justify-end {
+      position: absolute;
+      right: 20px;
+      top: 14px;
+      z-index: 10000;
+      &.z-playing {
+        .iconfont {
+          color: #4b4b4b !important;
+        }
+        .g-search {
+          background: rgba(0, 0, 0, 0.1);
+        }
+        .el-input__inner {
+          color: #4b4b4b;
+        }
+        .el-input__clear,
+        .el-input__prefix,
+        .el-input__suffix {
+          color: #4b4b4b !important;
+        }
+        input::-webkit-input-placeholder {
+          color: #4b4b4b;
         }
       }
     }

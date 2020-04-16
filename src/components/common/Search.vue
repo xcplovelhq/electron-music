@@ -22,6 +22,14 @@ export default {
       isFocus: false
     };
   },
+  computed: {
+    getDrawerType() {
+      return this.$store.state.drawerType;
+    },
+    isShowDrawer() {
+      return this.$store.state.isShowDrawer;
+    }
+  },
   methods: {
     handleFocus(event) {
       if (!event.relatedTarget) {
@@ -44,7 +52,7 @@ export default {
   padding: 0 4px 0 3px;
   border-radius: 50px;
   overflow: hidden;
-  background: #e56866;
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>
 
@@ -53,14 +61,19 @@ export default {
   cursor: text;
 
   .el-input__inner {
-    background: #e56866;
+    background: rgba(255, 255, 255, 0);
     border: 0;
     color: #fff;
     cursor: text;
   }
+  .el-input__icon {
+    transition: unset;
+  }
   .el-input__clear,
   .el-input__prefix,
   .el-input__suffix {
+    transition: unset;
+
     .main-text-color !important;
   }
   input::-webkit-input-placeholder {

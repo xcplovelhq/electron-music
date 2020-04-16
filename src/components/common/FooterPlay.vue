@@ -11,13 +11,16 @@
     </div>
     <div class="m-song-box">
       <template v-if="getPlayInfo && getPlayInfo.id">
-        <div class="m-avata">
+        <div class="m-avata" @click="openPlaying">
           <img
             :src="
               (getPlayInfo && getPlayInfo.al && getPlayInfo.al.picUrl) ||
                 getPlayInfo.album.picUrl
             "
           />
+          <div class="m-warper">
+            <i class="iconfont">&#xe621;</i>
+          </div>
         </div>
         <div class="m-song-info">
           <div class="flex-justify-start">
@@ -124,7 +127,7 @@ import { shuffle } from "@/lib/utils";
 
 // import { throttle } from "@/lib/utils";
 export default {
-  data () {
+  data() {
     return {
       time: "",
       volume: 0,
@@ -160,7 +163,7 @@ export default {
       ]
     };
   },
-  created () {
+  created() {
     ipcRenderer.on("control", (event, data) => {
       switch (data) {
         case "play":
@@ -179,7 +182,7 @@ export default {
       // ipcRenderer.send("control", "play");
     });
   },
-  mounted () {
+  mounted() {
     // let self = this;
     this.audio = this.$refs.audio;
     this.volume = this.$store.state.Play.volume;
@@ -197,14 +200,14 @@ export default {
     // };
   },
   computed: {
-    getCurrentTime () {
+    getCurrentTime() {
       return moment(this.currentTime * 1000).format("mm:ss");
     },
-    getPlayInfo () {
+    getPlayInfo() {
       return this.$store.state.Play.playInfo;
     },
 
-    getMusicUrl () {
+    getMusicUrl() {
       let url = "";
       let playUrls = this.$store.state.Play.playUrls;
       playUrls.forEach(item => {
@@ -214,7 +217,7 @@ export default {
       });
       return url;
     },
-    playing () {
+    playing() {
       if (this.$store.state.Play.isPlay) {
         this.audio && this.audio.play();
       } else {
@@ -224,27 +227,34 @@ export default {
     }
   },
   methods: {
-    getSongName (item, idx) {
+    openPlaying() {
+      this.$store.commit("SET_DRAWER_TYPE", "playing");
+      this.$store.commit(
+        "CHANGE_DRAWER_STATUS",
+        !this.$store.state.isShowDrawer
+      );
+    },
+    getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    handleLike () { },
-    getIsLike () {
+    handleLike() {},
+    getIsLike() {
       console.log(this.getPlayInfo, 111111);
 
       return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
     },
-    openList () {
+    openList() {
       this.$store.commit("SET_DRAWER_TYPE", "playList");
       this.$store.commit(
         "CHANGE_DRAWER_STATUS",
         !this.$store.state.isShowDrawer
       );
     },
-    handleLook () {
+    handleLook() {
       this.loopId++;
       if (this.loopId > 3) {
         this.loopId = 0;
@@ -252,30 +262,30 @@ export default {
       this.loopValue = this.loopList[this.loopId].index;
       this.$store.commit("SET_LOOP", this.loopValue);
     },
-    handleVolume () {
+    handleVolume() {
       this.audio.volume = this.volume;
       this.$store.commit("SET_VOLUME", this.volume);
     },
-    getDuration (e) {
+    getDuration(e) {
       this.duration = Math.floor(e.target.duration);
 
       this.time = moment(e.target.duration * 1000).format("mm:ss");
     },
-    getTimeupdate (e) {
+    getTimeupdate(e) {
       // console.log(e.target.currentTime);
 
       this.currentTime = Math.floor(e.target.currentTime);
     },
-    getEnded () {
+    getEnded() {
       this.getPLayList("NEXT", "END");
     },
-    handleChange () {
+    handleChange() {
       this.audio.currentTime = this.currentTime;
     },
-    handleInput () {
+    handleInput() {
       // this.currentTime = row;
     },
-    getPLayList (type, status) {
+    getPLayList(type, status) {
       let tracks = this.$store.state.Play.playDetails.tracks;
       let row = this.$store.state.Play.playInfo;
       if (this.loopValue === "random") {
@@ -313,7 +323,7 @@ export default {
         }
       });
     },
-    handleClick (type) {
+    handleClick(type) {
       switch (type) {
         case "PLAY":
           if (!this.$store.state.Play.isPlay) {
@@ -393,11 +403,39 @@ export default {
     min-width: 280px;
     margin-right: 90px;
     .m-avata {
+      position: relative;
       min-width: 39px;
       width: 39px;
       height: 39px;
       border-radius: 4px;
       overflow: hidden;
+      background: rgba(0, 0, 0, 0.5);
+      &:hover {
+        .m-warper {
+          display: block;
+        }
+        img {
+          filter: blur(1.5px);
+          opacity: 0.6;
+        }
+      }
+      .m-warper {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 0;
+        line-height: 38px;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background-size: cover;
+        cursor: pointer;
+        .iconfont {
+          font-size: 26px;
+          color: #fff;
+        }
+      }
       img {
         width: 100%;
         height: 100%;

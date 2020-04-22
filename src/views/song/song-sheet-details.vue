@@ -187,6 +187,13 @@ export default {
         .then(({ data }) => {
           this.isLoading = false;
           this.info = data.playlist;
+          data.privileges.forEach(item => {
+            this.info.tracks.forEach(v => {
+              if (item.id === v.id) {
+                v.st = item.st;
+              }
+            });
+          });
         });
     },
     getAlbum() {

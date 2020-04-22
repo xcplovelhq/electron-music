@@ -11,6 +11,11 @@ import Home from "@/views/home";
 import NewMusic from "@/views/music/";
 import SingerDetails from "@/views/singer/details";
 import UserDetails from "@/views/user/user-details";
+import Video from "@/views/video";
+import Mv from "@/views/video/mv";
+import MvRankAll from "@/views/video/mv-rank-all";
+import MvAll from "@/views/video/mv-all";
+import MvDetails from "@/views/video/mv-details";
 Vue.use(VueRouter);
 
 const routes = [
@@ -63,6 +68,26 @@ const routes = [
         path: "user-details",
         name: "userDetails",
         component: UserDetails
+      },
+      {
+        path: "video",
+        name: "video",
+        component: Video
+      },
+      {
+        path: "mv",
+        name: "mv",
+        component: Mv
+      },
+      {
+        path: "mvRankAll",
+        name: "mvRankAll",
+        component: MvRankAll
+      },
+      {
+        path: "mvAll",
+        name: "mvAll",
+        component: MvAll
       }
     ]
   },
@@ -70,6 +95,11 @@ const routes = [
     path: "/login",
     name: "login",
     component: Login
+  },
+  {
+    path: "/mvDetails",
+    name: "mvDetails",
+    component: MvDetails
   }
 ];
 

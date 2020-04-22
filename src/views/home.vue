@@ -11,17 +11,27 @@
         </transition>
         <el-drawer
           :visible="isShowDrawer"
-          :class="{ 'el-drawer__wrapper_playing': getDrawerType == 'playing' }"
-          @open="handleOpen"
-          @close="handleClose"
+          @open="handleOpen('base')"
+          @close="handleClose('base')"
           :withHeader="false"
           :modal="false"
-          :size="getDrawerType != 'playing' ? '420px' : '100%'"
-          :direction="getDrawerType != 'playing' ? 'rtl' : 'btt'"
+          :size="'420px'"
+          :direction="'rtl'"
         >
           <play-list v-if="getDrawerType === 'playList'"></play-list>
           <message v-else-if="getDrawerType === 'message'"></message>
-          <playing v-else-if="getDrawerType === 'playing'"></playing>
+        </el-drawer>
+        <el-drawer
+          :visible="isShowPlayingDrawer"
+          :class="'el-drawer__wrapper_playing'"
+          @open="handleOpen('playing')"
+          @close="handleClose('playing')"
+          :withHeader="false"
+          :modal="false"
+          :size="'100%'"
+          :direction="'btt'"
+        >
+          <playing></playing>
         </el-drawer>
       </div>
     </div>
@@ -42,32 +52,45 @@ import { getStorage } from "@/lib/store";
 export default {
   name: "home",
   components: { GHeader, GNav, GFooterPlay, PlayList, Message, Playing },
-  data () {
+  data() {
     return {};
   },
-  created () {
+  created() {
     console.log(getStorage());
     // deleteStorage("playList");
   },
   computed: {
-    key () {
+    key() {
       return this.$route.name
         ? this.$route.name + +new Date()
         : this.$route + +new Date();
     },
-    isShowDrawer () {
+    isShowDrawer() {
       return this.$store.state.isShowDrawer;
     },
-    getDrawerType () {
+    isShowPlayingDrawer() {
+      return this.$store.state.isShowPlayingDrawer;
+    },
+    getDrawerType() {
       return this.$store.state.drawerType;
     }
   },
   methods: {
-    handleOpen () {
-      this.$store.commit("CHANGE_DRAWER_STATUS", true);
+    handleOpen(type) {
+      console.log("");
+
+      if (type === "playing") {
+        this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", true);
+      } else {
+        this.$store.commit("CHANGE_DRAWER_STATUS", true);
+      }
     },
-    handleClose () {
-      this.$store.commit("CHANGE_DRAWER_STATUS", false);
+    handleClose(type) {
+      if (type === "playing") {
+        this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", false);
+      } else {
+        this.$store.commit("CHANGE_DRAWER_STATUS", false);
+      }
     }
   }
 };
@@ -98,6 +121,17 @@ export default {
     .el-drawer__body {
       height: 100%;
     }
+  }
+}
+.toasted-container.top-center {
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  .toasted .primary,
+  .toasted.toasted-primary {
+    border-radius: 16px;
+
+    padding: 30px;
+    font-size: 20px;
   }
 }
 </style>

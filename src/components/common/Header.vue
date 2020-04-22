@@ -10,26 +10,17 @@
     </div>
     <div class="m-main">
       <div class="m-nav">
-        <router-link :to="{ path: '/find' }" class="m-nav-item"
-          >个性推荐</router-link
-        >
-        <router-link :to="{ name: 'songSheet' }" class="m-nav-item"
-          >歌单</router-link
-        >
-        <!-- <router-link to="" class="m-nav-item">主播电台</router-link> -->
-        <router-link :to="{ name: 'rankingList' }" class="m-nav-item"
-          >排行榜</router-link
-        >
-        <router-link :to="{ name: 'singer' }" class="m-nav-item"
-          >歌手</router-link
-        >
-        <router-link :to="{ name: 'newMusic' }" class="m-nav-item"
-          >最新音乐</router-link
+        <router-link
+          :to="{ name: item.to }"
+          class="m-nav-item"
+          v-for="item in getRouter"
+          :key="item.to"
+          >{{ item.title }}</router-link
         >
       </div>
       <div
         class="flex-justify-end"
-        :class="{ 'z-playing': getDrawerType == 'playing' && isShowDrawer }"
+        :class="{ 'z-playing': getShowPlayingDrawer }"
       >
         <g-search></g-search>
         <div class="m-menu">
@@ -53,35 +44,75 @@ export default {
   components: {
     GSearch
   },
+  data() {
+    return {
+      defaultList: [
+        {
+          title: "个性推荐",
+          to: "find"
+        },
+        {
+          title: "歌单",
+          to: "songSheet"
+        },
+        {
+          title: "排行榜",
+          to: "rankingList"
+        },
+        {
+          title: "歌手",
+          to: "singer"
+        },
+        {
+          title: "最新音乐",
+          to: "newMusic"
+        }
+      ],
+      videoList: [
+        {
+          title: "视频",
+          to: "video"
+        },
+        {
+          title: "mv",
+          to: "mv"
+        }
+      ]
+    };
+  },
 
   computed: {
-    getMessageIdx () {
+    getMessageIdx() {
       return this.$store.state.User.messageIndex;
     },
-    getDrawerType () {
-      return this.$store.state.drawerType;
+    getShowPlayingDrawer() {
+      return this.$store.state.isShowPlayingDrawer;
     },
-    isShowDrawer () {
-      return this.$store.state.isShowDrawer;
+    getRouter() {
+      if (this.$route.name === "video" || this.$route.name === "mv") {
+        return this.videoList;
+      } else {
+        return this.defaultList;
+      }
     }
   },
-  created () {
+  created() {
     this.getMsgProvate();
   },
   methods: {
-    handleRouter (type) {
+    handleRouter(type) {
       if (type === "back") {
         this.$router.back();
       }
     },
-    handleMessage () {
+    handleMessage() {
       this.$store.commit("SET_DRAWER_TYPE", "message");
       this.$store.commit(
         "CHANGE_DRAWER_STATUS",
         !this.$store.state.isShowDrawer
       );
     },
-    getMsgProvate () {
+    getMsgProvate() {
       this.$store.dispatch("getMsgProvate");
     }
   }
@@ -199,7 +230,7 @@ export default {
         }
         &:hover {
           border-radius: 50%;
-          background: #d34947;
+          background: rgba(0, 0, 0, 0.1);
         }
       }
     }

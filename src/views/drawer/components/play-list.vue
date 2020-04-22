@@ -56,12 +56,9 @@ export default {
   },
   computed: {
     list() {
-      console.log(this.$store.state.Play);
+      console.log(this.$store.state.Play.playList);
 
-      return (
-        this.$store.state.Play.playDetails &&
-        this.$store.state.Play.playDetails.tracks
-      );
+      return this.$store.state.Play.playList;
     }
   },
   methods: {

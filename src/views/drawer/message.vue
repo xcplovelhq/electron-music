@@ -86,7 +86,7 @@ export default {
     Avata,
     Loading
   },
-  data () {
+  data() {
     return {
       showTips: false,
       limit: 20,
@@ -113,11 +113,11 @@ export default {
       ]
     };
   },
-  created () {
+  created() {
     this.getMsgProvate();
   },
   methods: {
-    getText (item) {
+    getText(item) {
       let text = "";
       let content = "";
       let regName = /@(\S*)/;
@@ -139,7 +139,7 @@ export default {
           if (regName.test(item.content)) {
             content = `<a>${item.content.match(regName)[0]}</a> ${
               item.content.match(regText)[0]
-              }`;
+            }`;
           } else {
             content = item.content;
           }
@@ -154,7 +154,7 @@ export default {
           if (regName.test(item.json.comment.content)) {
             text = `评价：<a>${
               item.json.comment.content.match(regName)[0]
-              }</a> ${item.json.comment.content.match(regText)[0]}`;
+            }</a> ${item.json.comment.content.match(regText)[0]}`;
           } else {
             text = "评价：" + item.json.comment.content;
           }
@@ -163,7 +163,7 @@ export default {
         case "通知":
           text = `我分享了单曲「${
             JSON.parse(item.notice.track.json).song.name
-            }」`;
+          }」`;
           break;
 
         default:
@@ -171,7 +171,7 @@ export default {
       }
       return text;
     },
-    getTime (item) {
+    getTime(item) {
       let time = "";
       let timeData = "";
       let timeNow = this.$moment();
@@ -195,7 +195,7 @@ export default {
       }
       return time;
     },
-    getTabIndex (name) {
+    getTabIndex(name) {
       this.messageList = [];
       this.showTips = false;
       this.tabList.forEach(item => {
@@ -222,7 +222,7 @@ export default {
         }
       });
     },
-    getMsgProvate () {
+    getMsgProvate() {
       this.$api.userData.getMsgProvate({}).then(({ data }) => {
         if (data.msgs && data.msgs.length > 0) {
           this.messageList = data.msgs;
@@ -237,7 +237,7 @@ export default {
         }
       });
     },
-    getMsgComments () {
+    getMsgComments() {
       this.$api.userData
         .getMsgComments({
           uid: this.$store.state.User.userInfo.userId
@@ -251,7 +251,7 @@ export default {
           }
         });
     },
-    getMsgForwards () {
+    getMsgForwards() {
       this.$api.userData.getMsgForwards({}).then(({ data }) => {
         if (data.forwards && data.forwards.length > 0) {
           this.messageList = data.forwards;
@@ -268,7 +268,7 @@ export default {
         }
       });
     },
-    getMsgNotices () {
+    getMsgNotices() {
       this.$api.userData.getMsgNotices({}).then(({ data }) => {
         if (data.notices && data.notices.length > 0) {
           this.messageList = data.notices;

@@ -11,7 +11,13 @@
     </div>
     <div class="m-song-box">
       <template v-if="getPlayInfo && getPlayInfo.id">
-        <div class="m-avata" @click="openPlaying">
+        <div
+          class="m-avata"
+          :class="{
+            active: $store.state.isShowPlayingDrawer
+          }"
+          @click="openPlaying"
+        >
           <img
             :src="
               (getPlayInfo && getPlayInfo.al && getPlayInfo.al.picUrl) ||
@@ -19,7 +25,10 @@
             "
           />
           <div class="m-warper">
-            <i class="iconfont">&#xe621;</i>
+            <i class="iconfont" v-if="$store.state.isShowPlayingDrawer"
+              >&#xe628;</i
+            >
+            <i class="iconfont" v-else>&#xe621;</i>
           </div>
         </div>
         <div class="m-song-info">
@@ -124,6 +133,7 @@ import moment from "moment";
 import { getStorage } from "@/lib/store";
 import { ipcRenderer } from "electron";
 import { shuffle } from "@/lib/utils";
+import { mapActions } from "vuex";
 
 // import { throttle } from "@/lib/utils";
 export default {
@@ -178,9 +188,9 @@ export default {
         default:
           break;
       }
-
       // ipcRenderer.send("control", "play");
     });
+    this.getSongUrlData();
   },
   mounted() {
     // let self = this;
@@ -200,6 +210,8 @@ export default {
     // };
   },
   computed: {
+    ...mapActions(["getSongUrl"]),
+
     getCurrentTime() {
       return moment(this.currentTime * 1000).format("mm:ss");
     },
@@ -228,10 +240,9 @@ export default {
   },
   methods: {
     openPlaying() {
-      this.$store.commit("SET_DRAWER_TYPE", "playing");
       this.$store.commit(
-        "CHANGE_DRAWER_STATUS",
-        !this.$store.state.isShowDrawer
+        "CHANGE_PLAYING_DRAWER_STATUS",
+        !this.$store.state.isShowPlayingDrawer
       );
     },
     getSongName(item, idx) {
@@ -243,8 +254,6 @@ export default {
     },
     handleLike() {},
     getIsLike() {
-      console.log(this.getPlayInfo, 111111);
-
       return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
     },
     openList() {
@@ -268,13 +277,11 @@ export default {
     },
     getDuration(e) {
       this.duration = Math.floor(e.target.duration);
-
       this.time = moment(e.target.duration * 1000).format("mm:ss");
     },
     getTimeupdate(e) {
-      // console.log(e.target.currentTime);
-
       this.currentTime = Math.floor(e.target.currentTime);
+      this.$store.commit("SET_CURRENT_TIME", e.target.currentTime);
     },
     getEnded() {
       this.getPLayList("NEXT", "END");
@@ -286,8 +293,10 @@ export default {
       // this.currentTime = row;
     },
     getPLayList(type, status) {
-      let tracks = this.$store.state.Play.playDetails.tracks;
+      let tracks = this.$store.state.Play.playList;
       let row = this.$store.state.Play.playInfo;
+      let nextRow = {};
+
       if (this.loopValue === "random") {
         tracks = this.randomMusic;
       }
@@ -304,21 +313,24 @@ export default {
         }
         return;
       }
+
       tracks.forEach((item, i) => {
         if (row.id === item.id) {
           if (type === "NEXT") {
             if (i >= tracks.length - 1) {
-              this.$store.commit("SET_PLAY_INFO", tracks[0]);
+              nextRow = tracks[0];
             } else {
-              this.$store.commit("SET_PLAY_INFO", tracks[i + 1]);
+              nextRow = tracks[i + 1];
             }
           } else {
             if (i <= 0) {
-              this.$store.commit("SET_PLAY_INFO", tracks[tracks.length - 1]);
+              nextRow = tracks[tracks.length - 1];
             } else {
-              this.$store.commit("SET_PLAY_INFO", tracks[i - 1]);
+              nextRow = tracks[i - 1];
             }
           }
+          this.$store.commit("SET_PLAY_INFO", nextRow);
+          this.$store.dispatch("getLyric", { id: nextRow.id });
           this.$store.commit("SET_ISPLAY", true);
         }
       });
@@ -342,6 +354,13 @@ export default {
         default:
           break;
       }
+    },
+    getSongUrlData() {
+      if (this.$store.state.Play.playDetails) {
+        this.$store.dispatch("getSongUrl", {
+          id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
+        });
+      }
     }
   }
 };
@@ -364,6 +383,7 @@ export default {
     left: 0;
     top: -2px;
     width: 100%;
+    z-index: 10000;
     .el-slider {
       &:hover {
         .el-slider__button {
@@ -400,7 +420,9 @@ export default {
   }
   .m-song-box {
     display: flex;
-    min-width: 280px;
+    flex: 1;
+    // min-width: 280px;
+    // max-width: 430px;
     margin-right: 90px;
     .m-avata {
       position: relative;
@@ -410,6 +432,7 @@ export default {
       border-radius: 4px;
       overflow: hidden;
       background: rgba(0, 0, 0, 0.5);
+      &.active,
       &:hover {
         .m-warper {
           display: block;
@@ -480,9 +503,12 @@ export default {
     }
   }
   .m-play-btn {
+    flex: 1;
+
     display: flex;
     align-items: center;
-    margin-right: 195px;
+    justify-content: center;
+    // margin-right: 195px;
     .iconfont {
       cursor: pointer;
       font-size: 18px;
@@ -513,7 +539,10 @@ export default {
     }
   }
   .m-play-order {
+    flex: 1;
+
     display: flex;
+    justify-content: flex-end;
     div {
       margin-left: 20px;
     }

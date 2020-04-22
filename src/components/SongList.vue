@@ -27,7 +27,13 @@
           <i class="iconfont i-download">&#xe675;</i>
 
           <div class="m-song-name">
-            <span :class="{ active: getPlayStatus(i) }">{{ i.name }}</span>
+            <span
+              :class="{
+                active: getPlayStatus(i),
+                'z-ls': (i.fee == 0 && i.st < 0) || i.fee == 1
+              }"
+              >{{ i.name }}</span
+            >
             <span class="m-text" v-if="i.alia && i.alia.length > 0"
               >（{{ i.alia[0] }}）</span
             >
@@ -103,7 +109,6 @@ export default {
       this.info = this.details;
     }
   },
-  created() {},
   methods: {
     ...mapActions(["getUserLikelist", "getSongUrl"]),
     getIsLike(row) {
@@ -116,17 +121,42 @@ export default {
       this.id = row.id;
     },
     handledbClick(row) {
-      this.$store.commit("SET_PLAY_INFO", row);
-      if (
-        getStorage("playDetails") &&
-        getStorage("playDetails").id !== this.info.id
-      ) {
-        this.getSongUrl({
-          id: this.info.tracks.map(item => item.id)
-        });
+      let list = [];
+      if (row.fee == 0 && row.st < 0) {
+        this.$toasted.show("因合作方要求，该资源暂时下架");
+        return;
       }
+      if (row.fee == 1) {
+        this.$toasted.show("版权方要求，当前歌曲仅限开通VIP使用");
+        return;
+      }
+      this.$store.commit("SET_PLAY_INFO", row);
+      // 同歌单下不重新获取url，但是网易云的歌曲url有时间限制，故取消
+      // if (
+      //   getStorage("playDetails") &&
+      //   getStorage("playDetails").id !== this.info.id
+      // ) {
+      //   this.getSongUrl({
+      //     id: this.info.tracks.map(item => item.id)
+      //   });
+      // }SET_PLAY_LIST
+      this.info.tracks.forEach(item => {
+        if ((item.fee == 0 && item.st < 0) || item.fee == 1) {
+          return;
+        } else {
+          list.push(item);
+        }
+      });
+      console.log(list);
+
+      this.getSongUrl({
+        id: this.info.tracks.map(item => item.id)
+      });
+      this.$store.commit("SET_PLAY_LIST", list);
+      this.$store.dispatch("getLyric", { id: row.id });
       this.$store.commit("SET_PLAY_DETAILS", this.info);
       this.$store.commit("SET_ISPLAY", true);
+      console.log(getStorage());
     },
     handleLike(status, row) {
       this.$api.musicData
@@ -154,6 +184,9 @@ export default {
         return false;
       }
     },
+    getSongStatus(row) {
+      console.log(row);
+    },
     getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item.name;
@@ -177,5 +210,125 @@ export default {
 
 <style lang="less">
 .g-song-list {
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 34px;
+    padding: 0 5px 0 30px;
+    cursor: default;
+    &:nth-child(2n -1) {
+      background: #fafafa;
+    }
+    &:hover {
+      background: #f2f2f3;
+    }
+    &.active {
+      background: #f0f0f0;
+    }
+    .iconfont {
+      width: 20px;
+      font-size: 16px;
+      color: #969696;
+      cursor: pointer;
+      &.active {
+        color: #d72b30;
+      }
+      &.i-download {
+        margin: 0 10px;
+      }
+    }
+    .m-num {
+      min-width: 30px;
+      font-size: 12px;
+      color: #cecece;
+      .iconfont {
+        color: @brand-color;
+      }
+    }
+    .m-song-name {
+      flex: 1;
+      min-width: 290px;
+      text-align: left;
+      font-size: 12px;
+      color: #444;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      font-size: 12px;
+      .m-text {
+        font-size: 12px;
+        color: #aeaeae;
+      }
+      .active {
+        color: @brand-color;
+      }
+      .z-ls {
+        color: #d0d0d0;
+      }
+    }
+    .m-name {
+      min-width: 140px;
+      flex: 1;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      a {
+        font-size: 12px;
+        color: #717171;
+        &:hover {
+          color: #444;
+        }
+      }
+    }
+    .m-album {
+      min-width: 185px;
+      flex: 1;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      a {
+        font-size: 12px;
+        color: #717171;
+        &:hover {
+          color: #444;
+        }
+      }
+    }
+    .m-time {
+      min-width: 70px;
+      flex: 1;
+      font-size: 12px;
+      color: #bdbdbd;
+    }
+    &.m-title {
+      background: #fff;
+      .m-num {
+        min-width: 84px;
+        &:hover {
+          background: #fff;
+        }
+      }
+      div {
+        height: 100%;
+        line-height: 34px;
+        font-size: 12px;
+        padding-left: 5px;
+        color: #a3a3a3;
+        cursor: default;
+        &:hover {
+          background: #f5f5f5;
+        }
+      }
+    }
+  }
 }
 </style>

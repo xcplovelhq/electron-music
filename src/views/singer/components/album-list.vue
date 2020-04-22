@@ -67,34 +67,34 @@ export default {
   components: {
     MyImage
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       list: [],
       limit: 10
     };
   },
-  created () {
+  created() {
     this.getArtistAlbum();
   },
   methods: {
-    getTime (time) {
+    getTime(time) {
       return Moment(time).format("YYYY-MM-DD");
     },
-    handleClick (row) {
+    handleClick(row) {
       this.$router.push({
         name: "songSheetDetails",
         query: { id: row.id, type: "album" }
       });
     },
-    load () {
+    load() {
       if (this.list.length < this.limit) {
         return;
       }
       this.limit += 10;
       this.getArtistAlbum();
     },
-    getArtistAlbum () {
+    getArtistAlbum() {
       this.isLoading = true;
       this.$api.singerData
         .getArtistAlbum({

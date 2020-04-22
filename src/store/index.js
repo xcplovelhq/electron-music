@@ -6,13 +6,20 @@ import Play from "./modules/Play";
 Vue.use(Vuex);
 const state = {
   isShowDrawer: false,
-  drawerType: "playList"
+  isShowPlayingDrawer: false,
+  drawerType: "playList",
+  mvArea: ["内地", "港台", "欧美", "日本", "韩国"]
 };
 const mutations = {
-  CHANGE_DRAWER_STATUS (state, data) {
+  CHANGE_DRAWER_STATUS(state, data) {
+    console.log(data);
+
     state.isShowDrawer = data;
   },
-  SET_DRAWER_TYPE (state, data) {
+  CHANGE_PLAYING_DRAWER_STATUS(state, data) {
+    state.isShowPlayingDrawer = data;
+  },
+  SET_DRAWER_TYPE(state, data) {
     state.drawerType = data;
   }
 };

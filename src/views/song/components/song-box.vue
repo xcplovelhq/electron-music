@@ -29,13 +29,13 @@ export default {
   props: {
     details: {
       type: Object,
-      default () {
+      default() {
         return {};
       }
     },
     list: {
       type: Array,
-      default () {
+      default() {
         return [];
       }
     },
@@ -44,12 +44,12 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       id: 0
     };
   },
-  created () { },
+  created() {},
   methods: {
     ...mapActions(["getUserLikelist", "getSongUrl"])
     // getIsLike (row) {
@@ -131,34 +131,14 @@ export default {
     height: 34px;
     padding: 0 5px 0 30px;
     cursor: default;
-    &:nth-child(2n -1) {
-      background: #fafafa;
-    }
+
     &:hover {
       background: #f2f2f3;
-    }
-    &.active {
-      background: #f0f0f0;
-    }
-    .iconfont {
-      width: 20px;
-      font-size: 16px;
-      color: #969696;
-      cursor: pointer;
-      &.active {
-        color: #d72b30;
-      }
-      &.i-download {
-        margin: 0 10px;
-      }
     }
     .m-num {
       min-width: 30px;
       font-size: 12px;
       color: #cecece;
-      .iconfont {
-        color: @brand-color;
-      }
     }
     .m-song-name {
       flex: 1;
@@ -166,53 +146,17 @@ export default {
       text-align: left;
       font-size: 12px;
       color: #444;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 1;
       font-size: 12px;
-      .m-text {
-        font-size: 12px;
-        color: #aeaeae;
-      }
-      .active {
-        color: @brand-color;
-      }
     }
     .m-name {
       min-width: 140px;
       flex: 1;
-      text-align: left;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 1;
-      a {
-        font-size: 12px;
-        color: #717171;
-        &:hover {
-          color: #444;
-        }
-      }
     }
     .m-album {
       min-width: 185px;
       flex: 1;
-      text-align: left;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 1;
-      a {
-        font-size: 12px;
-        color: #717171;
-        &:hover {
-          color: #444;
-        }
-      }
+      font-size: 12px;
+      color: #717171;
     }
     .m-time {
       min-width: 70px;

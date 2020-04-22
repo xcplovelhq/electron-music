@@ -30,13 +30,13 @@ export default {
   props: {
     tabList: {
       type: Array,
-      default () {
+      default() {
         return [];
       }
     }
   },
   methods: {
-    handleClick (row) {
+    handleClick(row) {
       this.$emit("getTabIndex", row.name);
     }
   }

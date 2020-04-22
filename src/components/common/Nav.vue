@@ -94,7 +94,7 @@ import { ipcRenderer } from "electron";
 import { getStorage } from "@/lib/store";
 import { mapActions } from "vuex";
 export default {
-  data () {
+  data() {
     return {
       isShowFound: true,
       isShowCollapse: false,
@@ -112,7 +112,7 @@ export default {
         {
           name: "视频",
           icon: "&#xe637;",
-          link: "mv"
+          link: "/video"
         },
         {
           name: "朋友",
@@ -152,7 +152,7 @@ export default {
       ]
     };
   },
-  created () {
+  created() {
     ipcRenderer.on("setUserInfoData", () => {
       if (getStorage("userInfo")) {
         this.$store.commit(
@@ -184,16 +184,16 @@ export default {
   },
   methods: {
     ...mapActions(["loginCellphone", "getUserPlaylist", "getUserLikelist"]),
-    handleLogin () {
-      if (getStorage("userInfo")) {
-        console.log("321");
-      } else {
-        ipcRenderer.send("openWin");
-      }
+    handleLogin() {
+      // if (getStorage("userInfo")) {
+      //   console.log("321");
+      // } else {
+      ipcRenderer.send("openWin");
+      // }
 
       // console.log(getStorage("userInfo"), 1111111111111);
     },
-    handleDetails () { }
+    handleDetails() {}
   }
 };
 </script>

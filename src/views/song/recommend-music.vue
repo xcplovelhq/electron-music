@@ -30,22 +30,22 @@ export default {
     SongBox,
     PlayBtn
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       songList: []
     };
   },
-  created () {
+  created() {
     this.getRecommendSongs();
   },
   computed: {
-    getTime () {
+    getTime() {
       return Moment().format("DD");
     }
   },
   methods: {
-    getRecommendSongs () {
+    getRecommendSongs() {
       this.$api.musicData.getRecommendSongs().then(({ data }) => {
         this.songList = data.recommend;
       });

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view :key="key"></router-view>
 
     <!-- <g-header></g-header>
     <div class="g-main">
@@ -23,7 +23,7 @@ export default {
   // components: { GHeader, GNav, GFooterPlay },
 
   computed: {
-    key () {
+    key() {
       return this.$route.name
         ? this.$route.name + +new Date()
         : this.$route + +new Date();

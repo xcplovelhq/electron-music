@@ -43,6 +43,7 @@ export default {
   position: relative;
   border-radius: 50px;
   overflow: hidden;
+
   &:before {
     content: "";
     padding-top: 100%;
@@ -69,6 +70,7 @@ export default {
     position: absolute;
     left: 50%;
     top: 50%;
+    transition: all 0.3s linear;
     transform: translate(-50%, -50%);
     background: url("../assets/play.png");
     background-size: cover;

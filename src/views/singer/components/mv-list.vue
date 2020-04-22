@@ -16,35 +16,35 @@
 <script>
 import { getSum } from "@/lib/utils";
 export default {
-  data () {
+  data() {
     return {
       isLoading: false,
       limit: 10,
       list: []
     };
   },
-  created () {
+  created() {
     this.getArtistMv();
   },
   methods: {
-    getSumData (time) {
+    getSumData(time) {
       return getSum(time);
     },
-    handleClick (row, type) {
+    handleClick(row, type) {
       if (type === "recommend") {
         this.$router.push({ name: "recommendMusic" });
       } else {
         this.$router.push({ name: "songSheetDetails", query: { id: row.id } });
       }
     },
-    load () {
+    load() {
       if (this.list.length < this.limit) {
         return;
       }
       this.limit += 10;
       this.getArtistMv();
     },
-    getArtistMv () {
+    getArtistMv() {
       this.$api.singerData
         .getArtistMv({
           id: this.$route.query.id,

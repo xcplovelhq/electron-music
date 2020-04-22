@@ -1,6 +1,8 @@
 <template>
   <div class="g-title">
-    <router-link to="">{{ title }}<i class="iconfont">&#xe72b;</i></router-link>
+    <router-link :to="to"
+      >{{ title }}<i class="iconfont">&#xe72b;</i></router-link
+    >
   </div>
 </template>
 
@@ -10,6 +12,12 @@ export default {
     title: {
       type: String,
       default: ""
+    },
+    to: {
+      type: Object,
+      default() {
+        return {};
+      }
     }
   }
 };
@@ -22,7 +30,7 @@ export default {
     font-size: 16px;
     color: #444;
     &:hover {
-      font-weight: bold;
+      color: #000;
     }
   }
   .iconfont {

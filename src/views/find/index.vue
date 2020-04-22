@@ -13,13 +13,54 @@
           </el-carousel-item>
         </el-carousel>
       </div>
-      <g-title title="推荐歌单"></g-title>
-      <song-sheet :list="songSheetList" type="recommend"></song-sheet>
-      <g-title title="最新音乐"></g-title>
-      <new-music :list="newSongList"></new-music>
-      <g-title title="推荐MV"></g-title>
-      <video-list :list="videoList"></video-list>
+      <template v-for="item in columnList">
+        <g-title :title="item.title" :key="item.title"></g-title>
+        <div :key="item.type">
+          <song-sheet
+            :list="songSheetList"
+            type="recommend"
+            v-if="item.type === 'song'"
+          ></song-sheet>
+          <new-music
+            :list="newSongList"
+            v-else-if="item.type === 'music'"
+          ></new-music>
+          <video-list
+            :list="videoList"
+            v-else-if="item.type === 'mv'"
+          ></video-list>
+        </div>
+      </template>
+      <div class="m-change">
+        <p>现在可以根据个人喜好，自有调整首页栏目顺序啦</p>
+        <div class="m-btn" @click="handleDialog">调整栏目顺序</div>
+      </div>
     </div>
+    <el-dialog
+      v-dialogDrag
+      title="调整栏目顺序"
+      center
+      :modal="false"
+      :visible.sync="visible"
+      width="330px"
+      class="m-column-dialog"
+    >
+      <div class="m-title">想调整首页栏目的顺序？按住右边的按钮拖动即可</div>
+      <draggable v-model="columnList" v-bind="dragOptions">
+        <transition-group type="transition" name="flip-list">
+          <div
+            class="m-column-item"
+            v-for="(item, idx) in columnList"
+            :key="idx"
+          >
+            <div>
+              {{ item.title }}
+            </div>
+          </div>
+        </transition-group>
+      </draggable>
+      <div class="m-reset" @click="handleReset">回复默认排序</div>
+    </el-dialog>
   </div>
 </template>
 
@@ -28,16 +69,36 @@ import GTitle from "@/components/Title";
 import SongSheet from "@/components/SongSheet";
 import NewMusic from "./components/new-music";
 import VideoList from "@/components/VideoList";
-
+import draggable from "vuedraggable";
 export default {
   components: {
     GTitle,
     SongSheet,
     NewMusic,
-    VideoList
+    VideoList,
+    draggable
   },
+  display: "Transition",
   data() {
     return {
+      visible: false,
+      columnList: [
+        {
+          id: 1,
+          title: "推荐歌单",
+          type: "song"
+        },
+        {
+          id: 2,
+          title: "最新音乐",
+          type: "music"
+        },
+        {
+          id: 3,
+          title: "推荐MV",
+          type: "mv"
+        }
+      ],
       bannerList: [],
       songSheetList: [],
       newSongList: [],
@@ -53,7 +114,24 @@ export default {
     this.getPersonalizedMv();
     this.getPersonalizedDjprogram();
   },
+  computed: {
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "description",
+        disabled: false,
+        ghostClass: "ghost"
+      };
+    }
+  },
   methods: {
+    handleDialog() {
+      this.visible = true;
+    },
+    handleReset() {
+      this.columnList = this.columnList.sort((a, b) => a.id - b.id);
+      console.log(this.columnList);
+    },
     getBanner() {
       this.$api.findData.getBanner().then(({ data }) => {
         this.bannerList = data.banners;
@@ -121,5 +199,77 @@ export default {
       background: #d54b4b;
     }
   }
+  .m-change {
+    margin-top: 80px;
+    text-align: center;
+    font-size: 12px;
+    color: #aeaeae;
+    .m-btn {
+      width: 122px;
+      height: 30px;
+      line-height: 28px;
+      margin: 10px auto 0;
+      border-radius: 15px;
+      font-size: 12px;
+      color: @brand-color;
+      border: 1px solid @brand-color;
+      cursor: pointer;
+      &:hover {
+        background: @brand-color;
+        color: #fff;
+      }
+    }
+  }
+  .m-reset {
+    text-align: center;
+    margin-top: 20px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .m-title {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #cacaca;
+  }
+  .m-column-item {
+    padding: 0px 20px;
+    cursor: move;
+    div {
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f3f3;
+    }
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+}
+</style>
+
+<style lang="less">
+.m-column-dialog .el-dialog--center .el-dialog__body {
+  padding: 0 0 30px 0;
+}
+.button {
+  margin-top: 35px;
+}
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #f5f5f5;
+}
+.list-group {
+  min-height: 20px;
+}
+.list-group-item {
+  cursor: move;
+}
+.list-group-item i {
+  cursor: pointer;
 }
 </style>

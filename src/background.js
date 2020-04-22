@@ -18,7 +18,7 @@ protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1200,
@@ -45,7 +45,7 @@ function createWindow () {
     win = null;
   });
 }
-function openWin () {
+function openWin() {
   loginWin = new BrowserWindow({
     // resizable: false,
     width: 350,
@@ -68,7 +68,7 @@ function openWin () {
     loginWin = null;
   });
 }
-ipcMain.on("openWin", e => openWin());
+ipcMain.on("openWin", () => openWin());
 ipcMain.on("login", (e, data) => {
   console.log(e, data);
   loginWin.close();

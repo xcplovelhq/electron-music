@@ -53,6 +53,8 @@
     "vue-cli-plugin-electron-builder": "^1.4.6",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-cli-plugin-style-resources-loader": "^0.1.4",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "vue-toasted": "^1.1.28",
+    "vuedraggable": "^2.23.2"
   }
 }

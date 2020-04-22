@@ -4,6 +4,7 @@ import songData from "./song";
 import singerData from "./singer";
 import musicData from "./music";
 import albumData from "./album";
+import videoData from "./video";
 
 export default {
   userData,
@@ -11,5 +12,6 @@ export default {
   songData,
   singerData,
   musicData,
-  albumData
+  albumData,
+  videoData
 };

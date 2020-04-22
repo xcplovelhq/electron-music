@@ -19,7 +19,19 @@
                 >
                 {{ v.content }}
               </div>
-              <div class="m-reply"></div>
+              <div
+                class="m-comment m-reply"
+                v-if="v.beReplied && v.beReplied.length > 0"
+              >
+                <router-link
+                  :to="{
+                    name: 'userDetails',
+                    query: { id: v.beReplied[0].user.userId }
+                  }"
+                  >@{{ v.beReplied[0].user.nickname }}:</router-link
+                >
+                {{ v.beReplied[0].content }}
+              </div>
               <div class="m-tips flex-justify-between">
                 <div class="m-time">
                   {{ $moment(v.time).format("M月D日 kk:mm") }}
@@ -59,7 +71,7 @@ export default {
     Avata,
     Loading
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       total: 0,
@@ -84,15 +96,12 @@ export default {
   props: {
     type: String
   },
-  created () {
-    console.log(this.type);
+  created() {
     this.getData(1);
   },
-  mounted () {
-    console.log();
-  },
+  mounted() {},
   methods: {
-    getData (row) {
+    getData(row) {
       switch (this.type) {
         case "songSheet":
           this.getCommentPlaylist(row);
@@ -100,15 +109,24 @@ export default {
         case "album":
           this.getCommentAlbum(row);
           break;
+        case "playing":
+          this.getCommentMusic(row);
+          break;
+        case "video":
+          this.getCommentVideo(row);
+          break;
+        case "mv":
+          this.getCommentMv(row);
+          break;
         default:
           break;
       }
     },
-    handleChange (row) {
+    handleChange(row) {
       this.params.offset = row;
       this.getData(row);
     },
-    getCommentPlaylist (offset) {
+    getCommentPlaylist(offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -133,7 +151,7 @@ export default {
           this.isLoading = false;
         });
     },
-    getCommentAlbum (offset) {
+    getCommentAlbum(offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -146,6 +164,81 @@ export default {
       }
       this.$api.albumData
         .getCommentAlbum({
+          id: this.$route.query.id,
+          limit: this.params.limit,
+          offset: offset - 1
+        })
+        .then(({ data }) => {
+          this.total = data.total;
+          hotC.list = data.hotComments || [];
+          newC.list = data.comments || [];
+          this.isLoading = false;
+        });
+    },
+    getCommentMusic(offset) {
+      let hotC = this.commentList[0];
+      let newC = this.commentList[1];
+      this.isLoading = true;
+      newC.list = [];
+      hotC.list = [];
+      if (this.params.offset > 1) {
+        hotC.isShow = false;
+      } else {
+        hotC.isShow = true;
+      }
+
+      this.$api.musicData
+        .getCommentMusic({
+          id: this.$store.state.Play.playInfo.id,
+          limit: this.params.limit,
+          offset: offset - 1
+        })
+        .then(({ data }) => {
+          this.total = data.total;
+          hotC.list = data.hotComments || [];
+          newC.list = data.comments || [];
+          this.isLoading = false;
+        });
+    },
+    getCommentVideo(offset) {
+      let hotC = this.commentList[0];
+      let newC = this.commentList[1];
+      this.isLoading = true;
+      newC.list = [];
+      hotC.list = [];
+      if (this.params.offset > 1) {
+        hotC.isShow = false;
+      } else {
+        hotC.isShow = true;
+      }
+
+      this.$api.videoData
+        .getCommentVideo({
+          id: this.$route.query.id,
+          limit: this.params.limit,
+          offset: offset - 1
+        })
+        .then(({ data }) => {
+          this.total = data.total;
+          hotC.list = data.hotComments || [];
+          newC.list = data.comments || [];
+          this.isLoading = false;
+        });
+    },
+    getCommentMv(offset) {
+      let hotC = this.commentList[0];
+      let newC = this.commentList[1];
+      this.isLoading = true;
+      newC.list = [];
+      hotC.list = [];
+      if (this.params.offset > 1) {
+        hotC.isShow = false;
+      } else {
+        hotC.isShow = true;
+      }
+
+      this.$api.videoData
+        .getCommentMv({
           id: this.$route.query.id,
           limit: this.params.limit,
           offset: offset - 1
@@ -184,10 +277,19 @@ export default {
         padding-bottom: 20px;
         .m-comment {
           font-size: 13px;
-          color: #707070;
+          color: #333;
           a {
-            color: #8fa5c6;
+            color: #8ba1c3;
+            &:hover {
+              color: #6b86b2;
+            }
           }
+        }
+        .m-reply {
+          margin-top: 8px;
+          padding: 10px 8px;
+          border-radius: 8px;
+          background: #f0eff0;
         }
         .m-tips {
           margin-top: 7px;

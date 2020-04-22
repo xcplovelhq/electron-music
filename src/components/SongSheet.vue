@@ -40,7 +40,7 @@ export default {
   props: {
     list: {
       type: Array,
-      default () {
+      default() {
         return [];
       }
     },
@@ -58,10 +58,10 @@ export default {
     }
   },
   computed: {
-    getTime () {
+    getTime() {
       return Moment().format("DD");
     },
-    getImg () {
+    getImg() {
       return (
         this.list[this.list.length - 1] &&
         this.list[this.list.length - 1].picUrl
@@ -69,14 +69,14 @@ export default {
     }
   },
   methods: {
-    getSum (num) {
+    getSum(num) {
       if (num > 100000) {
         return (num / 10000).toFixed(0) + "万";
       } else {
         return num;
       }
     },
-    getIndex (index) {
+    getIndex(index) {
       if (this.type === "recommend") {
         if (index < 9) {
           return true;
@@ -93,7 +93,7 @@ export default {
         }
       }
     },
-    handleClick (row, type) {
+    handleClick(row, type) {
       if (type === "recommend") {
         this.$router.push({ name: "recommendMusic" });
       } else {

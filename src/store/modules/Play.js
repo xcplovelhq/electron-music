@@ -63,6 +63,15 @@ const actions = {
       commit("SET_LYRIC", data);
       return data ? data : {};
     }
+  },
+  async getSongDetails({ dispatch, commit }, payload) {
+    let { data } = await api.musicData.getSongDetails(payload);
+    if (data.code === 200) {
+      commit("SET_PLAY_INFO", data.songs[0]);
+      dispatch("getSongUrl", { id: payload.ids });
+      dispatch("getLyric", { id: payload.ids });
+      return data ? data.songs[0] : {};
+    }
   }
 };
 export default {

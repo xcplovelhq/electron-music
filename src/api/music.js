@@ -56,6 +56,14 @@ const getSimiSong = async function(data) {
   });
   return res;
 };
+// 获取音乐详情
+const getSongDetails = async function(data) {
+  const res = await axios.get({
+    url: "/song/detail",
+    data
+  });
+  return res;
+};
 
 export default {
   getTopSong,
@@ -64,5 +72,6 @@ export default {
   getSongUrl,
   getLyric,
   getCommentMusic,
-  getSimiSong
+  getSimiSong,
+  getSongDetails
 };

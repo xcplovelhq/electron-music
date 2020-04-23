@@ -5,8 +5,28 @@
       <div class="m-official">
         <div class="m-items" v-for="item in officialList" :key="item.idx">
           <div class="m-img">
-            <img class="m-bac" :src="item.bacUrl" fit="fill" />
-            <img class="m-pic" :src="item.picUrl" fit="fill" />
+            <el-image
+              class="m-bac"
+              :src="item.bacUrl || require('@/assets/disc.png')"
+              fit="fill"
+              style="width: 100%; height: 100%"
+            >
+              <div class="m-error" slot="placeholder">
+                <i slot="placeholder" class="iconfont">&#xe635;</i>
+              </div>
+            </el-image>
+            <el-image
+              class="m-pic"
+              :src="item.picUrl || require('@/assets/disc.png')"
+              fit="fill"
+              style="width: 100%; height: 100%"
+            >
+              <div class="m-error" slot="placeholder">
+                <i slot="placeholder" class="iconfont">&#xe635;</i>
+              </div>
+            </el-image>
+            <!-- <img class="m-bac" :src="item.bacUrl" fit="fill" />
+            <img class="m-pic" :src="item.picUrl" fit="fill" /> -->
             <div class="m-time">{{ item.time }}</div>
           </div>
           <div class="m-list">
@@ -237,6 +257,25 @@ export default {
           }
         }
       }
+    }
+  }
+}
+</style>
+
+<style lang="less">
+.g-ranking-list {
+  .m-error {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #e0e0e0;
+    .iconfont {
+      font-size: 4em;
+      color: #fff;
     }
   }
 }

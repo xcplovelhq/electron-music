@@ -49,7 +49,7 @@ export default {
     Loading,
     NewDish
   },
-  data() {
+  data () {
     return {
       isActive: true,
       navId: 0,
@@ -79,16 +79,16 @@ export default {
       ]
     };
   },
-  created() {
+  created () {
     this.getTopSong();
     this.getTopAlbum();
   },
   methods: {
-    handleClick(row) {
+    handleClick (row) {
       this.navId = row.id;
       this.getTopSong();
     },
-    getTopSong() {
+    getTopSong () {
       this.isLoading = true;
       this.musicList = [];
       this.$api.musicData
@@ -100,7 +100,7 @@ export default {
           this.isLoading = false;
         });
     },
-    getTopAlbum() {
+    getTopAlbum () {
       this.isLoading = true;
       this.albumList = [];
       this.$api.albumData
@@ -116,7 +116,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .g-new-music {
   padding-top: 20px;
   .m-tabs {

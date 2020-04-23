@@ -2,19 +2,26 @@
   <div class="g-find ">
     <div class="g-warper">
       <div class="g-banner">
-        <el-carousel :interval="4000" type="card" height="200px">
-          <el-carousel-item v-for="item in bannerList" :key="item.key">
+        <el-carousel
+          :interval="4000"
+          type="card"
+          height="200px"
+          @change="getBannerIdx"
+          trigger="click"
+        >
+          <el-carousel-item v-for="(item, idx) in bannerList" :key="item.key">
             <el-image
               class="m-banner-img"
-              :src="item.imageUrl"
+              :src="item.imageUrl + '?imageView&quality=80'"
               fit="fill"
+              @click="handleClick(item, idx)"
             ></el-image>
             <div class="m-tips">{{ item.typeTitle }}</div>
           </el-carousel-item>
         </el-carousel>
       </div>
       <template v-for="item in columnList">
-        <g-title :title="item.title" :key="item.title"></g-title>
+        <g-title :title="item.title" :key="item.title" :to="item.to"></g-title>
         <div :key="item.type">
           <song-sheet
             :list="songSheetList"
@@ -68,7 +75,7 @@
 import GTitle from "@/components/Title";
 import SongSheet from "@/components/SongSheet";
 import NewMusic from "./components/new-music";
-import VideoList from "@/components/VideoList";
+import VideoList from "./components/VideoList";
 import draggable from "vuedraggable";
 export default {
   components: {
@@ -79,24 +86,27 @@ export default {
     draggable
   },
   display: "Transition",
-  data() {
+  data () {
     return {
       visible: false,
       columnList: [
         {
           id: 1,
           title: "推荐歌单",
-          type: "song"
+          type: "song",
+          to: { name: "songSheet" }
         },
         {
           id: 2,
           title: "最新音乐",
-          type: "music"
+          type: "music",
+          to: { name: "newMusic" }
         },
         {
           id: 3,
           title: "推荐MV",
-          type: "mv"
+          type: "mv",
+          to: { name: "mv" }
         }
       ],
       bannerList: [],
@@ -106,7 +116,7 @@ export default {
       djList: []
     };
   },
-  created() {
+  created () {
     this.getBanner();
     this.getPersonalized();
     this.getRecommendResource();
@@ -115,8 +125,9 @@ export default {
     this.getPersonalizedDjprogram();
   },
   computed: {
-    dragOptions() {
+    dragOptions () {
       return {
+        bannerIdx: 0,
         animation: 200,
         group: "description",
         disabled: false,
@@ -125,50 +136,80 @@ export default {
     }
   },
   methods: {
-    handleDialog() {
+    handleDialog () {
       this.visible = true;
     },
-    handleReset() {
+    handleReset () {
       this.columnList = this.columnList.sort((a, b) => a.id - b.id);
-      console.log(this.columnList);
     },
-    getBanner() {
+    handleClick (row, idx) {
+      if (idx === this.bannerIdx) {
+        if (row.targetType === 1) {
+          let playList = this.$store.state.Play.playList;
+          let playInfo = this.$store.state.Play.playInfo;
+          let playIdx = playList.findIndex(function (obj) {
+            return obj.id === playInfo.id;
+          });
+          let rowIdx = playList.findIndex(function (obj) {
+            return obj.id === row.targetId;
+          });
+          if (rowIdx >= 0) {
+            playList.splice(rowIdx, 1);
+          }
+          this.$store
+            .dispatch("getSongDetails", { ids: row.targetId })
+            .then(data => {
+              if (playIdx >= 0) {
+                playList.splice(playIdx + 1, 0, data);
+              } else {
+                playList.push(data);
+              }
+              this.$store.commit("SET_PLAY_LIST", playList);
+              this.$store.commit("SET_ISPLAY", true);
+            });
+        } else if (row.targetType === 10) {
+          this.$router.push({
+            name: "songSheetDetails",
+            query: {
+              id: row.targetId,
+              type: "album"
+            }
+          });
+        }
+      }
+    },
+    getBannerIdx (row) {
+      this.bannerIdx = row;
+    },
+    getBanner () {
       this.$api.findData.getBanner().then(({ data }) => {
         this.bannerList = data.banners;
       });
     },
-    getPersonalized() {
+    getPersonalized () {
       this.$api.findData.getPersonalized().then(({ data }) => {
-        console.log(data);
-
         this.songSheetList = data.result;
       });
     },
-    getRecommendResource() {
+    getRecommendResource () {
       this.$api.findData.getRecommendResource().then(({ data }) => {
         console.log(data);
 
         // this.songSheetList = data.recommend;
       });
     },
-    getPersonalizedNewsong() {
+    getPersonalizedNewsong () {
       this.$api.findData.getPersonalizedNewsong().then(({ data }) => {
-        console.log(data);
-
         this.newSongList = data.result;
       });
     },
-    getPersonalizedMv() {
+    getPersonalizedMv () {
       this.$api.findData.getPersonalizedMv().then(({ data }) => {
-        console.log(data);
-
         this.videoList = data.result;
       });
     },
-    getPersonalizedDjprogram() {
+    getPersonalizedDjprogram () {
       this.$api.findData.getPersonalizedDjprogram().then(({ data }) => {
-        console.log(data);
-
         this.djList = data.result;
       });
     }

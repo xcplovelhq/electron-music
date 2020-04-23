@@ -2,12 +2,8 @@
   <div class="g-video-list">
     <template v-for="(item, index) in list">
       <div class="m-items" v-if="index < min" :key="item.key">
-        <div class="m-img">
-          <el-image class="img" :src="item.picUrl" fit="fill"></el-image>
-          <div class="m-play-num">
-            <i class="iconfont">&#xe607;</i>{{ getSum(item.playCount) }}
-          </div>
-        </div>
+        <mv-image :mv="item" type="mv"></mv-image>
+
         <div class="m-text">
           <h3>{{ item.name }}</h3>
           <p>{{ item.artists[0].name }}</p>
@@ -19,11 +15,16 @@
 
 <script>
 import Moment from "moment";
+import MvImage from "@/components/MvImage";
+
 export default {
+  components: {
+    MvImage
+  },
   props: {
     list: {
       type: Array,
-      default() {
+      default () {
         return [];
       }
     },
@@ -33,10 +34,10 @@ export default {
     }
   },
   computed: {
-    getTime() {
+    getTime () {
       return Moment().format("DD");
     },
-    getImg() {
+    getImg () {
       return (
         this.list[this.list.length - 1] &&
         this.list[this.list.length - 1].picUrl
@@ -44,7 +45,7 @@ export default {
     }
   },
   methods: {
-    getSum(num) {
+    getSum (num) {
       if (num > 100000) {
         return (num / 10000).toFixed(0) + "万";
       } else {

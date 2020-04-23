@@ -1,11 +1,21 @@
 <template>
-  <div class="g-mv-image">
+  <div class="g-mv-image" ref="mvImage">
     <el-image
       class="img"
-      :src="mv.cover || mv.coverUrl || mv.data.coverUrl"
+      :src="
+        (mv.cover || mv.coverUrl || mv.picUrl || mv.data.coverUrl) +
+          `?param=${width}y${height}`
+      "
       fit="cover"
       @click="handleClick"
-    ></el-image>
+    >
+      <div class="m-error" slot="placeholder">
+        <i slot="placeholder" class="iconfont">&#xe635;</i>
+      </div>
+      <div class="m-error" slot="error">
+        <i slot="placeholder" class="iconfont">&#xe635;</i>
+      </div></el-image
+    >
     <div class="m-play-num">
       <i class="iconfont">&#xe607;</i
       >{{ getSumData(mv.playCount || (mv.data && mv.data.praisedCount)) }}
@@ -23,6 +33,16 @@ export default {
   props: {
     mv: Object,
     type: String
+  },
+  data() {
+    return {
+      width: 150,
+      height: 100
+    };
+  },
+  mounted() {
+    this.width = this.$refs.mvImage.clientWidth;
+    this.height = this.$refs.mvImage.clientHeight;
   },
   methods: {
     getSumData(time) {
@@ -93,6 +113,24 @@ export default {
     z-index: 100;
     font-size: 12px;
     color: #fff;
+  }
+}
+</style>
+<style lang="less">
+.g-mv-image {
+  .m-error {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #e0e0e0;
+    .iconfont {
+      font-size: 4em;
+      color: #fff;
+    }
   }
 }
 </style>

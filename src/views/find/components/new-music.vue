@@ -1,12 +1,29 @@
 <template>
   <div class="g-new-music">
     <div class="m-items">
-      <div class="m-item" v-for="(item, index) in list" :key="item.key">
-        <router-link to="">
-          <avata :ImgUrl="item.picUrl" Size="60" Radius="8"></avata>
-        </router-link>
+      <div
+        class="m-item"
+        v-for="(item, idx) in list"
+        :key="item.key"
+        @dblclick="handleClick(item)"
+      >
+        <div @click="handleClick(item)">
+          <my-image
+            :ImgUrl="item.picUrl"
+            IconSize="24px"
+            Size="60px"
+            Radius="4"
+            style="cursor: pointer;"
+          ></my-image>
+        </div>
         <div class="m-num">
-          {{ getSum(index + 1) }} <i class="iconfont">&#xe810;</i>
+          <template v-if="getPlayStatus(item)">
+            <i class="iconfont" v-if="$store.state.Play.isPlay">&#xe610;</i>
+            <i class="iconfont" v-else>&#xe60f;</i>
+          </template>
+          <template v-else>
+            {{ getSum(idx + 1) }}
+          </template>
         </div>
         <div class="m-text">
           <h3 :title="item.song && item.song.name + (item.song.alias[0] || '')">
@@ -30,10 +47,11 @@
 </template>
 
 <script>
-import Avata from "@/components/Avata";
+import MyImage from "@/components/Image";
+
 export default {
   components: {
-    Avata
+    MyImage
   },
   props: {
     list: {
@@ -54,6 +72,38 @@ export default {
       } else {
         return idx;
       }
+    },
+    getPlayStatus(row) {
+      if (
+        this.$store.state.Play.playInfo &&
+        row.id === this.$store.state.Play.playInfo.id
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    handleClick(row) {
+      let playList = this.$store.state.Play.playList;
+      let playInfo = this.$store.state.Play.playInfo;
+      let playIdx = playList.findIndex(function(obj) {
+        return obj.id === playInfo.id;
+      });
+      let rowIdx = playList.findIndex(function(obj) {
+        return obj.id === row.id;
+      });
+      if (rowIdx >= 0) {
+        playList.splice(rowIdx, 1);
+      }
+      this.$store.dispatch("getSongDetails", { ids: row.id }).then(data => {
+        if (playIdx >= 0) {
+          playList.splice(playIdx + 1, 0, data);
+        } else {
+          playList.push(data);
+        }
+        this.$store.commit("SET_PLAY_LIST", playList);
+        this.$store.commit("SET_ISPLAY", true);
+      });
     },
     getSongNameTitle(row) {
       return row.map(item => item.name).join(" / ");

@@ -30,12 +30,13 @@
               query: { id: item.id }
             }"
           >
-            <avata
+            <my-image :ImgUrl="item.picUrl" Size="100%" Radius="8"></my-image>
+            <!-- <avata
               class="m-avata"
               :ImgUrl="item.picUrl"
               Size="140"
               Radius="8"
-            ></avata>
+            ></avata> -->
             <div class="m-info">
               <h3>{{ item.name }}</h3>
             </div>
@@ -47,11 +48,11 @@
 </template>
 
 <script>
-import Avata from "@/components/Avata";
+import MyImage from "@/components/Image";
 
 export default {
   components: {
-    Avata
+    MyImage
   },
   data() {
     return {

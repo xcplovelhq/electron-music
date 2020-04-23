@@ -1,8 +1,9 @@
 <template>
   <div class="g-song-sheet-list">
     <div class="m-items" v-if="type === 'recommend'">
-      <div class="m-img m-filter" @click="handleClick(item, 'recommend')">
-        <img class="img" :src="getImg" />
+      <div class="m-song-img m-filter" @click="handleClick(item, 'recommend')">
+        <my-image :ImgUrl="getImg" Size="100%" Radius="8"></my-image>
+        <!-- <img class="img" :src="getImg" /> -->
         <div class="m-time">
           <div class="m-time-text">{{ getTime }}</div>
           <i class="iconfont">&#xe7c5;</i>
@@ -18,12 +19,17 @@
         v-if="getIndex(index) && index >= max"
         :key="item.key"
       >
-        <div class="m-img" @click="handleClick(item)">
-          <el-image
+        <div class="m-song-img" @click="handleClick(item)">
+          <my-image
+            :ImgUrl="item.picUrl || item.coverImgUrl"
+            Size="100%"
+            Radius="8"
+          ></my-image>
+          <!-- <el-image
             class="img"
             :src="item.picUrl || item.coverImgUrl"
             fit="fill"
-          ></el-image>
+          ></el-image> -->
           <div class="m-play-num">
             <i class="iconfont">&#xe607;</i>{{ getSum(item.playCount) }}
           </div>
@@ -36,7 +42,12 @@
 
 <script>
 import Moment from "moment";
+import MyImage from "@/components/Image";
+
 export default {
+  components: {
+    MyImage
+  },
   props: {
     list: {
       type: Array,
@@ -119,25 +130,26 @@ export default {
     &:not(:nth-child(5n)) {
       margin-right: calc(10% / 4);
     }
-    .m-img {
-      position: relative;
+    .m-song-img {
       width: 100%;
+      position: relative;
+
       overflow: hidden;
       border-radius: 8px;
-      cursor: pointer;
-      &::before {
-        content: "";
-        padding-top: 100%;
-        display: block;
-      }
-      .img {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        z-index: 99;
-      }
+      // cursor: pointer;
+      // &::before {
+      //   content: "";
+      //   padding-top: 100%;
+      //   display: block;
+      // }
+      // .img {
+      //   position: absolute;
+      //   left: 0;
+      //   top: 0;
+      //   height: 100%;
+      //   width: 100%;
+      //   z-index: 99;
+      // }
       .m-play-num {
         position: absolute;
         right: 0px;
@@ -156,7 +168,7 @@ export default {
         }
       }
       &.m-filter {
-        .img {
+        img {
           filter: blur(5px);
         }
       }

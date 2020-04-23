@@ -2,6 +2,7 @@
   <div
     class="g-image"
     :class="{ 'z-hover': isHover }"
+    ref="myImage"
     :style="{
       width: Size,
       height: Size,
@@ -10,7 +11,15 @@
     }"
   >
     <div class="m-img">
-      <img :src="ImgUrl" alt="" />
+      <el-image :src="getImgUrl" fit="fill" style="width: 100%; height: 100%">
+        <div class="m-error" slot="placeholder">
+          <i slot="placeholder" class="iconfont">&#xe635;</i>
+        </div>
+        <div class="m-error" slot="error">
+          <i slot="placeholder" class="iconfont">&#xe635;</i>
+        </div>
+      </el-image>
+      <!-- <img :src="ImgUrl" alt="" /> -->
       <div
         class="m-play-btn"
         :style="{
@@ -34,6 +43,18 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  data() {
+    return {
+      getImgUrl: require("@/assets/disc.png")
+    };
+  },
+
+  mounted() {
+    setTimeout(() => {
+      let width = this.$refs.myImage.clientWidth || 200;
+      this.getImgUrl = this.ImgUrl + `?param=${width}y${width}`;
+    }, 10);
   }
 };
 </script>
@@ -81,7 +102,27 @@ export default {
     top: 0;
     transform: translateX(-50%);
     height: 100%;
+    width: 100%;
     border: 0;
+  }
+}
+</style>
+
+<style lang="less">
+.g-image {
+  .m-error {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #e0e0e0;
+    .iconfont {
+      font-size: 4em;
+      color: #fff;
+    }
   }
 }
 </style>

@@ -1,7 +1,10 @@
 <template>
-  <div class="g-drawer-play-list">
-    <div class="m-header"></div>
+  <div class="g-play-list">
     <div class="m-list">
+      <div class="m-no">
+        <h3>你还没有添加任何歌曲</h3>
+        <p>去首页<span @click="handleFind">发现音乐</span></p>
+      </div>
       <Loading v-if="isLoading"></Loading>
       <ul v-else>
         <template v-for="i in list">
@@ -72,6 +75,12 @@ export default {
         return false;
       }
     },
+    handleFind() {
+      this.$store.commit("CHANGE_DRAWER_STATUS", false);
+      this.$router.push({
+        name: "find"
+      });
+    },
     handleClick(row) {
       this.id = row.id;
     },
@@ -109,13 +118,31 @@ export default {
 </script>
 
 <style lang="less">
-.g-drawer-play-list {
+.g-play-list {
   height: 100%;
-  margin-top: 20px;
 
   .m-list {
     height: calc(100% - 50px);
     overflow-y: auto;
+  }
+  .m-no {
+    padding: 100px 0 0 130px;
+    h3 {
+      font-size: 16px;
+      color: #b0b0b0;
+    }
+    p {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #b0b0b0;
+      span {
+        text-decoration: underline;
+        color: #444;
+        &:hover {
+          color: #000;
+        }
+      }
+    }
   }
   li {
     position: relative;

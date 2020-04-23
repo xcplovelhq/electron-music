@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view :key="key"></router-view>
+    <router-view></router-view>
 
     <!-- <g-header></g-header>
     <div class="g-main">

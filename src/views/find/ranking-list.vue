@@ -4,61 +4,69 @@
       <div class="m-title">官方榜</div>
       <div class="m-official">
         <div class="m-items" v-for="item in officialList" :key="item.idx">
-          <div class="m-img">
-            <el-image
-              class="m-bac"
-              :src="item.bacUrl || require('@/assets/disc.png')"
-              fit="fill"
-              style="width: 100%; height: 100%"
-            >
-              <div class="m-error" slot="placeholder">
-                <i slot="placeholder" class="iconfont">&#xe635;</i>
-              </div>
-            </el-image>
-            <el-image
-              class="m-pic"
-              :src="item.picUrl || require('@/assets/disc.png')"
-              fit="fill"
-              style="width: 100%; height: 100%"
-            >
-              <div class="m-error" slot="placeholder">
-                <i slot="placeholder" class="iconfont">&#xe635;</i>
-              </div>
-            </el-image>
-            <!-- <img class="m-bac" :src="item.bacUrl" fit="fill" />
-            <img class="m-pic" :src="item.picUrl" fit="fill" /> -->
-            <div class="m-time">{{ item.time }}</div>
-          </div>
-          <div class="m-list">
-            <ul>
-              <template v-for="(i, idx) in item.data">
-                <li :key="i.id" v-if="idx < 5">
-                  <div class="flex-justify-start">
-                    <div class="m-num">{{ idx + 1 }}</div>
-                    <div class="m-tag"></div>
-                    <div class="m-song-name">
-                      {{ i.name }}
-                      <span v-if="i.alia && i.alia.length > 0"
-                        >（{{ i.alia[0] }}）</span
-                      >
-                    </div>
-                  </div>
-                  <div class="m-name">
-                    <router-link to="" v-for="(v, idx) in i.ar" :key="v.id">{{
-                      getSongName(v, idx)
-                    }}</router-link>
-                  </div>
-                </li>
-              </template>
-            </ul>
-            <div class="m-more">
-              <router-link
-                :to="{ name: 'songSheetDetails', query: { id: item.id } }"
-                >查看更多</router-link
+          <a-skeleton
+            v-if="item.data && item.data.length <= 0"
+            :avatar="{ size: 170, shape: 'square' }"
+            active
+            :paragraph="{ rows: 4 }"
+          />
+          <template v-else>
+            <div class="m-img">
+              <el-image
+                class="m-bac"
+                :src="item.bacUrl || require('@/assets/disc.png')"
+                fit="fill"
+                style="width: 100%; height: 100%"
               >
-              <i class="iconfont">&#xe72b;</i>
+                <div class="m-error" slot="placeholder">
+                  <i slot="placeholder" class="iconfont">&#xe635;</i>
+                </div>
+              </el-image>
+              <el-image
+                class="m-pic"
+                :src="item.picUrl || require('@/assets/disc.png')"
+                fit="fill"
+                style="width: 100%; height: 100%"
+              >
+                <div class="m-error" slot="placeholder">
+                  <i slot="placeholder" class="iconfont">&#xe635;</i>
+                </div>
+              </el-image>
+              <!-- <img class="m-bac" :src="item.bacUrl" fit="fill" />
+            <img class="m-pic" :src="item.picUrl" fit="fill" /> -->
+              <div class="m-time">{{ item.time }}</div>
             </div>
-          </div>
+            <div class="m-list">
+              <ul>
+                <template v-for="(i, idx) in item.data">
+                  <li :key="i.id" v-if="idx < 5">
+                    <div class="flex-justify-start">
+                      <div class="m-num">{{ idx + 1 }}</div>
+                      <div class="m-tag"></div>
+                      <div class="m-song-name">
+                        {{ i.name }}
+                        <span v-if="i.alia && i.alia.length > 0"
+                          >（{{ i.alia[0] }}）</span
+                        >
+                      </div>
+                    </div>
+                    <div class="m-name">
+                      <router-link to="" v-for="(v, idx) in i.ar" :key="v.id">{{
+                        getSongName(v, idx)
+                      }}</router-link>
+                    </div>
+                  </li>
+                </template>
+              </ul>
+              <div class="m-more">
+                <router-link
+                  :to="{ name: 'songSheetDetails', query: { id: item.id } }"
+                  >查看更多</router-link
+                >
+                <i class="iconfont">&#xe72b;</i>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
       <div class="m-title">全球榜</div>

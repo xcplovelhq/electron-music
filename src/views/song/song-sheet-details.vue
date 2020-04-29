@@ -1,12 +1,13 @@
 <template>
   <div class="g-song-sheet-details">
     <div class="m-song-info">
-      <Avata
+      <my-image
+        class="m-avata"
         :ImgUrl="info.coverImgUrl"
-        Size="200"
+        Size="200px"
         Radius="8"
         v-if="type !== 'album'"
-      ></Avata>
+      ></my-image>
       <div v-else class="m-avata-bg">
         <my-image
           class="m-avata"
@@ -25,9 +26,13 @@
             :ImgUrl="info.creator && info.creator.avatarUrl"
             Size="24"
           ></Avata>
-          <router-link to="">{{
-            info.creator && info.creator.nickname
-          }}</router-link>
+          <router-link
+            :to="{
+              name: 'userDetails',
+              query: { id: info.creator && info.creator.userId }
+            }"
+            >{{ info.creator && info.creator.nickname }}</router-link
+          >
           <span>{{ getTime(info.createTime) }}创建</span>
         </div>
         <div class="m-btns">
@@ -53,7 +58,7 @@
         <div class="m-text" v-if="type === 'album'">
           <p>
             歌手：<router-link
-              to=""
+              :to="{ name: 'singerDetails', query: { id: item.id } }"
               v-for="(item, idx) in info.artists"
               :key="idx"
               >{{ getSongName(item.name, idx) }}</router-link
@@ -64,7 +69,7 @@
         <div class="m-text" v-else>
           <p>
             标签：<router-link
-              to=""
+              :to="{ name: 'songSheet', query: { tag: item } }"
               v-for="(item, idx) in info.tags"
               :key="idx"
               >{{ getSongName(item, idx) }}</router-link
@@ -95,7 +100,7 @@
         <song-box :details="info" :isLoading="isLoading"></song-box>
       </el-tab-pane>
       <el-tab-pane label="评论" name="second">
-        <div style="padding:0 30px">
+        <div style="padding:15px 30px">
           <comment-list :type="type"></comment-list>
         </div>
       </el-tab-pane>
@@ -106,7 +111,10 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="收藏者" name="third" v-else
-        ><collectors :list="info.subscribers"></collectors>
+        ><collectors
+          style="margin-top: 15px;"
+          :list="info.subscribers"
+        ></collectors>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -129,7 +137,7 @@ export default {
     MyImage,
     CommentList
   },
-  data() {
+  data () {
     return {
       type: "",
       offset: 0,
@@ -140,7 +148,7 @@ export default {
       comment: {}
     };
   },
-  created() {
+  created () {
     this.type = this.$route.query.type;
     if (this.type === "album") {
       this.getAlbum();
@@ -150,34 +158,34 @@ export default {
     }
   },
   methods: {
-    getTime(time) {
+    getTime (time) {
       return Moment(time).format("YYYY-MM-DD");
     },
-    getSum(num) {
+    getSum (num) {
       if (num > 100000) {
         return (num / 10000).toFixed(0) + "万";
       } else {
         return num;
       }
     },
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item || item;
       } else {
         return item;
       }
     },
-    getDescribe(v) {
+    getDescribe (v) {
       let reg = /[\r\n]/g;
 
       return v && v.replace(reg, "<br />");
     },
-    handleMore() {
+    handleMore () {
       this.isMore = !this.isMore;
 
       // return getSum(v);
     },
-    getPlaylistDetail() {
+    getPlaylistDetail () {
       this.isLoading = true;
       this.$api.songData
         .getPlaylistDetail({
@@ -196,7 +204,7 @@ export default {
           });
         });
     },
-    getAlbum() {
+    getAlbum () {
       this.isLoading = true;
       this.$api.albumData
         .getAlbum({
@@ -212,7 +220,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .g-song-sheet-details {
   .m-song-info {
     display: flex;
@@ -340,20 +348,13 @@ export default {
       color: #333;
     }
   }
-  .el-tabs__item {
-    color: #555;
-    &:hover {
-      color: #222;
-    }
-  }
+}
+</style>
+
+<style lang="less">
+.g-song-sheet-details {
   .el-tabs__header {
-    margin: 0 30px 15px 30px;
-  }
-  .el-tabs__item.is-active {
-    color: @brand-color;
-  }
-  .el-tabs__active-bar {
-    background: @brand-color;
+    margin: 0 30px 0px 30px;
   }
 }
 </style>

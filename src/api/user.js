@@ -8,6 +8,16 @@ const loginCellphone = async function(data) {
   });
   return res;
 };
+
+// 刷新登录状态
+const loginRefresh = async function(data) {
+  const res = await axios.get({
+    url: "/login/refresh",
+    data
+  });
+  return res;
+};
+
 // 获取用户详情
 const getUserDetail = async function(data) {
   const res = await axios.get({
@@ -81,8 +91,33 @@ const getSimiUser = async function(data) {
   });
   return res;
 };
+// 搜索
+const search = async function(data) {
+  const res = await axios.get({
+    url: "/search",
+    data
+  });
+  return res;
+};
+// 获取搜索热搜
+const getSearchHot = async function(data) {
+  const res = await axios.get({
+    url: "/search/hot",
+    data
+  });
+  return res;
+};
+// 获取搜索建议
+const getSearchSuggest = async function(data) {
+  const res = await axios.get({
+    url: "/search/suggest",
+    data
+  });
+  return res;
+};
 export default {
   getUserDetail,
+  loginRefresh,
   loginCellphone,
   getUserPlaylist,
   getUserLikelist,
@@ -91,5 +126,8 @@ export default {
   getMsgComments,
   getMsgForwards,
   getMsgNotices,
-  getSimiUser
+  getSimiUser,
+  search,
+  getSearchHot,
+  getSearchSuggest
 };

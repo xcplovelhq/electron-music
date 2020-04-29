@@ -3,8 +3,11 @@
     <el-image
       class="img"
       :src="
-        (mv.cover || mv.coverUrl || mv.picUrl || mv.data.coverUrl) +
-          `?param=${width}y${height}`
+        (mv.cover ||
+          mv.coverUrl ||
+          mv.picUrl ||
+          mv.imgurl ||
+          mv.data.coverUrl) + `?param=${width}y${height}`
       "
       fit="cover"
       @click="handleClick"
@@ -18,7 +21,14 @@
     >
     <div class="m-play-num">
       <i class="iconfont">&#xe607;</i
-      >{{ getSumData(mv.playCount || (mv.data && mv.data.praisedCount)) }}
+      >{{
+        getSumData(
+          mv.playCount || mv.playTime || (mv.data && mv.data.praisedCount)
+        )
+      }}
+    </div>
+    <div class="m-time" v-if="mv.durationms">
+      {{ $moment(mv.durationms).format("mm:ss") }}
     </div>
     <div class="m-time" v-if="mv.data">
       {{ $moment(mv.data.durationms).format("mm:ss") }}

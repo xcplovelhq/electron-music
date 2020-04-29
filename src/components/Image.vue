@@ -46,15 +46,25 @@ export default {
   },
   data() {
     return {
-      getImgUrl: require("@/assets/disc.png")
+      getImgUrl: require("@/assets/default.png")
     };
   },
 
   mounted() {
     setTimeout(() => {
+      let width = this.$refs.myImage.clientWidth * 2 || 200;
+      this.getImgUrl = this.ImgUrl
+        ? this.ImgUrl + `?param=${width}y${width}`
+        : require("@/assets/default.png");
+    }, 0);
+  },
+  watch: {
+    ImgUrl() {
       let width = this.$refs.myImage.clientWidth || 200;
-      this.getImgUrl = this.ImgUrl + `?param=${width}y${width}`;
-    }, 10);
+      this.getImgUrl = this.ImgUrl
+        ? this.ImgUrl + `?param=${width}y${width}`
+        : require("@/assets/default.png");
+    }
   }
 };
 </script>

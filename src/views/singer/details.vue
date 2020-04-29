@@ -48,6 +48,7 @@
         <type-list :type="isType" v-if="activeName === 'first'"></type-list>
       </el-tab-pane>
       <el-tab-pane label="MV" name="second">
+        <div class="m-no" v-if="mvList && mvList.length <= 0">没有相关MV</div>
         <div>
           <mv-list
             :list="mvList"
@@ -96,7 +97,6 @@ export default {
   },
   created() {
     this.getSingerDetail();
-    this.getArtistDesc();
   },
   methods: {
     getSum(num) {
@@ -127,6 +127,7 @@ export default {
         .then(({ data }) => {
           this.isLoading = false;
           this.info = data.artist;
+          this.getArtistDesc();
         });
     },
     getArtistDesc() {
@@ -136,6 +137,8 @@ export default {
         })
         .then(({ data }) => {
           this.isLoading = false;
+          console.log(this.info);
+
           this.desc = data.introduction;
           this.desc.unshift({
             ti: this.info.name + "简介",
@@ -149,6 +152,11 @@ export default {
 
 <style lang="less">
 .g-singer-details {
+  .m-no {
+    padding-top: 50px;
+    width: 100%;
+    text-align: center;
+  }
   .m-song-info {
     display: flex;
     padding: 14px 30px;
@@ -159,6 +167,7 @@ export default {
       background: url(../../assets/record-bg.png) no-repeat;
       background-size: cover;
     }
+
     .m-info {
       flex: 1;
       margin-left: 30px;

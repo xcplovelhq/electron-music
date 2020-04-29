@@ -19,7 +19,7 @@
         </div>
       </div> -->
       <div class="m-text" @click="handleClick(item)">
-        {{ item.name || item.data.title }}
+        {{ item.name || item.title || item.data.title }}
       </div>
       <div class="m-name">
         <span v-if="item.data">by</span>
@@ -42,7 +42,7 @@ export default {
     list: Array,
     type: String
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       limit: 10
@@ -50,10 +50,10 @@ export default {
   },
 
   methods: {
-    getSumData (time) {
+    getSumData(time) {
       return getSum(time);
     },
-    handleClick (item) {
+    handleClick(item) {
       let id = 0;
       if (this.type === "video") {
         id = item.data.vid;

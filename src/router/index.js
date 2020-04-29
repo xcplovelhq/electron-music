@@ -4,6 +4,8 @@ import Find from "../views/find";
 import RankingList from "../views/find/ranking-list";
 import SongSheet from "@/views/song/";
 import SongSheetDetails from "@/views/song/song-sheet-details";
+import BoutiqueSong from "@/views/song/boutique-song";
+import MvDetails from "@/views/video/mv-details";
 import Singer from "@/views/singer";
 import RecommendMusic from "@/views/song/recommend-music";
 import Login from "@/views/login/";
@@ -15,7 +17,7 @@ import Video from "@/views/video";
 import Mv from "@/views/video/mv";
 import MvRankAll from "@/views/video/mv-rank-all";
 import MvAll from "@/views/video/mv-all";
-import MvDetails from "@/views/video/mv-details";
+import Search from "@/views/search";
 Vue.use(VueRouter);
 
 const routes = [
@@ -43,6 +45,11 @@ const routes = [
         path: "song-sheet-details",
         name: "songSheetDetails",
         component: SongSheetDetails
+      },
+      {
+        path: "boutique-song",
+        name: "boutiqueSong",
+        component: BoutiqueSong
       },
       {
         path: "recommend-music",
@@ -88,6 +95,11 @@ const routes = [
         path: "mvAll",
         name: "mvAll",
         component: MvAll
+      },
+      {
+        path: "search",
+        name: "search",
+        component: Search
       }
     ]
   },

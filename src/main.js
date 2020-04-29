@@ -2,6 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import "ant-design-vue/dist/antd.css";
 import "@/less/index.less";
 import api from "./api";
 import "./plugins/element.js";
@@ -9,6 +10,10 @@ import VueAwesomeSwiper from "vue-awesome-swiper";
 import Moment from "moment";
 import Toasted from "vue-toasted";
 import "./lib/directives";
+import { Drawer, Skeleton, Spin } from "ant-design-vue";
+Vue.use(Drawer);
+Vue.use(Skeleton);
+Vue.use(Spin);
 
 // require styles
 import "swiper/css/swiper.css";

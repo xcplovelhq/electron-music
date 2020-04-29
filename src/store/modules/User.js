@@ -6,7 +6,9 @@ const state = {
   userInfo: getStorage("userInfo") || {}, // 用户信息
   likeMusicIds: getStorage("likeMusicIds") || [], //喜欢的音乐Id
   likeSongSheet: getStorage("likeSongSheet") || [],
-  messageIndex: 0
+  messageIndex: 0,
+  search: "", //搜索内容
+  searchHistory: getStorage("searchHistory") || [] //搜索历史
 };
 const getters = {};
 const mutations = {
@@ -24,6 +26,13 @@ const mutations = {
   },
   SET_USER_MSG_NUM(state, data) {
     state.messageIndex = data;
+  },
+  SET_SEARCH(state, data) {
+    state.search = data;
+  },
+  SET_SEARCH_HISTORY(state, data) {
+    storage("searchHistory", data);
+    state.searchHistory = data;
   }
 };
 const actions = {
@@ -52,7 +61,6 @@ const actions = {
   },
   async getMsgProvate({ commit }, payload) {
     let { data } = await api.userData.getMsgProvate(payload);
-
     if (data.code === 200) {
       commit("SET_USER_MSG_NUM", data.newMsgCount);
       return data ? data : {};

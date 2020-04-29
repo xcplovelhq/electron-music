@@ -10,7 +10,7 @@
       </li>
     </ul>
     <Loading v-if="isLoading"></Loading>
-    <song-list :list="list" :details="details"></song-list>
+    <song-list :type="type" :list="list" :details="details"></song-list>
   </div>
 </template>
 
@@ -31,6 +31,12 @@ export default {
       type: Object,
       default() {
         return {};
+      }
+    },
+    type: {
+      type: String,
+      default() {
+        return "";
       }
     },
     list: {
@@ -124,21 +130,24 @@ export default {
 <style lang="less">
 .g-song-box {
   border-top: 1px solid #e5e5e5;
-  li {
+  .m-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 34px;
     padding: 0 5px 0 30px;
+    background: #fff;
     cursor: default;
-
     &:hover {
       background: #f2f2f3;
     }
     .m-num {
-      min-width: 30px;
       font-size: 12px;
       color: #cecece;
+      min-width: 84px;
+      &:hover {
+        background: #fff;
+      }
     }
     .m-song-name {
       flex: 1;
@@ -164,24 +173,15 @@ export default {
       font-size: 12px;
       color: #bdbdbd;
     }
-    &.m-title {
-      background: #fff;
-      .m-num {
-        min-width: 84px;
-        &:hover {
-          background: #fff;
-        }
-      }
-      div {
-        height: 100%;
-        line-height: 34px;
-        font-size: 12px;
-        padding-left: 5px;
-        color: #a3a3a3;
-        cursor: default;
-        &:hover {
-          background: #f5f5f5;
-        }
+    div {
+      height: 100%;
+      line-height: 34px;
+      font-size: 12px;
+      padding-left: 5px;
+      color: #a3a3a3;
+      cursor: default;
+      &:hover {
+        background: #f5f5f5;
       }
     }
   }

@@ -22,3 +22,28 @@
     max-width: 1040px;
     margin: 0 auto;
 }
+.el-tabs__item {
+color: #555!important;
+&:hover {
+    color: #222!important;
+}
+}
+.el-tabs__item.is-active {
+color: @brand-color!important;
+}
+.el-tabs__active-bar {
+background: @brand-color!important;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+    background: @brand-color!important;
+  }
+
+    .el-pagination.is-background
+    .el-pager
+    li:not(.disabled).active:hover {
+    color: #fff!important;
+  }
+.el-pagination.is-background .el-pager li:not(.disabled):hover {
+    color: #606266!important;
+  }

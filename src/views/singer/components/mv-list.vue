@@ -1,12 +1,13 @@
 <template>
   <div class="g-mv-list" v-infinite-scroll="load">
     <div class="m-items" v-for="item in list" :key="item.key">
-      <div class="m-img" @click="handleClick(item)">
-        <el-image class="img" :src="item.imgurl" fit="fill"></el-image>
-        <div class="m-play-num">
+      <div>
+        <mv-image :mv="item" type="mv"></mv-image>
+        <!-- <el-image class="img" :src="item.imgurl" fit="fill"></el-image> -->
+        <!-- <div class="m-play-num">
           <i class="iconfont">&#xe607;</i>{{ getSumData(item.playCount) }}
         </div>
-        <div class="m-time">{{ $moment(item.duration).format("mm:ss") }}</div>
+        <div class="m-time">{{ $moment(item.duration).format("mm:ss") }}</div> -->
       </div>
       <div class="m-text" @click="handleClick(item)">{{ item.name }}</div>
     </div>
@@ -15,7 +16,12 @@
 
 <script>
 import { getSum } from "@/lib/utils";
+import MvImage from "@/components/MvImage";
+
 export default {
+  components: {
+    MvImage
+  },
   data() {
     return {
       isLoading: false,
@@ -30,12 +36,11 @@ export default {
     getSumData(time) {
       return getSum(time);
     },
-    handleClick(row, type) {
-      if (type === "recommend") {
-        this.$router.push({ name: "recommendMusic" });
-      } else {
-        this.$router.push({ name: "songSheetDetails", query: { id: row.id } });
-      }
+    handleClick(row) {
+      this.$router.push({
+        name: "mvDetails",
+        query: { id: row.id, type: "mv" }
+      });
     },
     load() {
       if (this.list.length < this.limit) {

@@ -18,14 +18,15 @@
             class="m-circle-bg  z-rotate"
             :class="{ 'z-norotate': !playing }"
           >
-            <Avata
+            <my-image
+              style="margin: 0 auto;"
               :ImgUrl="
                 (getPlayInfo && getPlayInfo.al && getPlayInfo.al.picUrl) ||
                   getPlayInfo.album.picUrl
               "
-              style="margin: 0 auto;"
-              Size="210"
-            ></Avata>
+              Size="210px"
+              Radius="200"
+            ></my-image>
           </div>
         </div>
         <div class="m-song">
@@ -120,16 +121,16 @@
 </template>
 
 <script>
-import Avata from "@/components/Avata";
 import mImage from "@/components/Image";
 
 import { getSingerName, getSum } from "@/lib/utils";
 import CommentList from "@/components/CommentList";
 // import Loading from "@/components/Loading";
+import MyImage from "@/components/Image";
 
 export default {
   components: {
-    Avata,
+    MyImage,
     CommentList,
     // Loading,
     mImage
@@ -295,7 +296,6 @@ export default {
 <style lang="less" scoped>
 .g-playing {
   height: 100%;
-  padding-top: 50px;
   overflow-y: auto;
   .g-play-warper {
     width: 880px;
@@ -314,7 +314,7 @@ export default {
     width: 100%;
     height: 50px;
     z-index: 1000;
-    background: #f8f7f8;
+    background: #fff;
   }
   .m-playing {
     .m-btn {

@@ -54,7 +54,7 @@ export default {
   components: {
     MyImage
   },
-  data() {
+  data () {
     return {
       languages: {
         type: "语种",
@@ -229,15 +229,15 @@ export default {
       singerList: []
     };
   },
-  created() {
+  created () {
     this.getArtistList();
   },
   methods: {
-    handleClick(item, i) {
+    handleClick (item, i) {
       item.value = i.index;
       this.getArtistList();
     },
-    getArtistList() {
+    getArtistList () {
       this.$api.singerData
         .getArtistList({
           cat: this.languages.value + this.classify.value,

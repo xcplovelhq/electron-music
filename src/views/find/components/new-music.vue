@@ -56,7 +56,7 @@ export default {
   props: {
     list: {
       type: Array,
-      default() {
+      default () {
         return [];
       }
     },
@@ -66,14 +66,14 @@ export default {
     }
   },
   methods: {
-    getSum(idx) {
+    getSum (idx) {
       if (idx < 10) {
         return "0" + idx;
       } else {
         return idx;
       }
     },
-    getPlayStatus(row) {
+    getPlayStatus (row) {
       if (
         this.$store.state.Play.playInfo &&
         row.id === this.$store.state.Play.playInfo.id
@@ -83,32 +83,13 @@ export default {
         return false;
       }
     },
-    handleClick(row) {
-      let playList = this.$store.state.Play.playList;
-      let playInfo = this.$store.state.Play.playInfo;
-      let playIdx = playList.findIndex(function(obj) {
-        return obj.id === playInfo.id;
-      });
-      let rowIdx = playList.findIndex(function(obj) {
-        return obj.id === row.id;
-      });
-      if (rowIdx >= 0) {
-        playList.splice(rowIdx, 1);
-      }
-      this.$store.dispatch("getSongDetails", { ids: row.id }).then(data => {
-        if (playIdx >= 0) {
-          playList.splice(playIdx + 1, 0, data);
-        } else {
-          playList.push(data);
-        }
-        this.$store.commit("SET_PLAY_LIST", playList);
-        this.$store.commit("SET_ISPLAY", true);
-      });
+    handleClick (row) {
+      this.$store.dispatch("getSongDetails", { ids: row.id });
     },
-    getSongNameTitle(row) {
+    getSongNameTitle (row) {
       return row.map(item => item.name).join(" / ");
     },
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {

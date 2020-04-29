@@ -18,12 +18,15 @@
           }"
           @click="openPlaying"
         >
-          <img
-            :src="
+          <my-image
+            :ImgUrl="
               (getPlayInfo && getPlayInfo.al && getPlayInfo.al.picUrl) ||
                 getPlayInfo.album.picUrl
             "
-          />
+            Size="100%"
+            Radius="8"
+          ></my-image>
+
           <div class="m-warper">
             <i class="iconfont" v-if="$store.state.isShowPlayingDrawer"
               >&#xe628;</i
@@ -134,9 +137,13 @@ import { getStorage } from "@/lib/store";
 import { ipcRenderer } from "electron";
 import { shuffle } from "@/lib/utils";
 import { mapActions } from "vuex";
+import MyImage from "@/components/Image";
 
 // import { throttle } from "@/lib/utils";
 export default {
+  components: {
+    MyImage
+  },
   data() {
     return {
       time: "",
@@ -377,7 +384,7 @@ export default {
   padding: 0 30px 0 10px;
   border-top: 2px solid #f5f5f5;
   background: #fff;
-
+  z-index: 10000;
   .m-slider {
     position: absolute;
     left: 0;

@@ -1,7 +1,12 @@
 <template>
   <div class="g-type-list">
     <div class="m-big-picture" v-if="type == 0">
-      <ul v-infinite-scroll="load" infinite-scroll-immediate>
+      <Loading v-if="isLoading"></Loading>
+      <ul
+        v-infinite-scroll="load"
+        infinite-scroll-immediate
+        :infinite-scroll-distance="20"
+      >
         <router-link
           v-for="item in list"
           :key="item.id"
@@ -11,21 +16,22 @@
             query: { id: item.id, type: dataType === 'user' ? '' : 'album' }
           }"
         >
-          <div class="m-avata-bg" v-if="dataType !== 'user'">
+          <div class="m-song-img">
             <my-image
+              v-if="dataType !== 'user'"
               :ImgUrl="item.picUrl || item.coverImgUrl"
               IconSize="40px"
-              Size="90%"
+              Size="100%"
               Radius="8"
               :isHover="true"
             ></my-image>
+            <my-image
+              v-else
+              :ImgUrl="item.picUrl || item.coverImgUrl"
+              Size="100%"
+              Radius="8"
+            ></my-image>
           </div>
-          <my-image
-            v-else
-            :ImgUrl="item.picUrl || item.coverImgUrl"
-            Size="200px"
-            Radius="8"
-          ></my-image>
 
           <div class="m-info">
             <h3>
@@ -40,7 +46,12 @@
       </ul>
     </div>
     <div class="m-list-model" v-else-if="type == 1">
-      <ul v-infinite-scroll="modelLoad" infinite-scroll-immediate>
+      <Loading v-if="isLoading"></Loading>
+      <ul
+        v-infinite-scroll="modelLoad"
+        infinite-scroll-immediate
+        :infinite-scroll-distance="20"
+      >
         <template v-for="item in list">
           <li :key="item.id">
             <my-image
@@ -68,6 +79,7 @@
 <script>
 import Moment from "moment";
 import MyImage from "@/components/Image";
+import Loading from "@/components/Loading";
 
 export default {
   props: {
@@ -75,7 +87,8 @@ export default {
     dataType: String
   },
   components: {
-    MyImage
+    MyImage,
+    Loading
   },
   data() {
     return {
@@ -152,19 +165,19 @@ export default {
   .m-big-picture {
     padding: 0 30px;
     ul {
-      display: grid;
-      // flex-wrap: wrap;
-      justify-content: space-between;
-      grid-row-gap: 10px;
-      grid-column-gap: 10px;
-      grid-template-columns: repeat(auto-fill, 18%);
+      display: flex;
+      flex-wrap: wrap;
       li {
-        width: 100%;
+        width: 18%;
+        &:not(:nth-child(5n)) {
+          margin-right: calc(10% / 4);
+        }
+        // width: 100%;
         margin-bottom: 20px;
         cursor: pointer;
-        &:last-child {
-          margin-right: auto;
-        }
+        // &:last-child {
+        //   margin-right: auto;
+        // }
         .m-info {
           margin-top: 5px;
           h3 {
@@ -236,12 +249,10 @@ export default {
   }
   .m-tuglie {
   }
-  .m-avata-bg {
+  .m-song-img {
     position: relative;
-    // width: 183px;
-    // height: 155px;
-    background: url(../assets/record-bg.png) no-repeat;
-    background-size: cover;
+    width: 100%;
+    overflow: hidden;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="g-find ">
-    <div class="g-warper">
+    <div class="g-warper" ref="warper">
       <div class="g-banner">
         <el-carousel
           :interval="4000"
@@ -113,7 +113,8 @@ export default {
       songSheetList: [],
       newSongList: [],
       videoList: [],
-      djList: []
+      djList: [],
+      i: 0
     };
   },
   created () {
@@ -145,28 +146,7 @@ export default {
     handleClick (row, idx) {
       if (idx === this.bannerIdx) {
         if (row.targetType === 1) {
-          let playList = this.$store.state.Play.playList;
-          let playInfo = this.$store.state.Play.playInfo;
-          let playIdx = playList.findIndex(function (obj) {
-            return obj.id === playInfo.id;
-          });
-          let rowIdx = playList.findIndex(function (obj) {
-            return obj.id === row.targetId;
-          });
-          if (rowIdx >= 0) {
-            playList.splice(rowIdx, 1);
-          }
-          this.$store
-            .dispatch("getSongDetails", { ids: row.targetId })
-            .then(data => {
-              if (playIdx >= 0) {
-                playList.splice(playIdx + 1, 0, data);
-              } else {
-                playList.push(data);
-              }
-              this.$store.commit("SET_PLAY_LIST", playList);
-              this.$store.commit("SET_ISPLAY", true);
-            });
+          this.$store.dispatch("getSongDetails", { ids: row.targetId });
         } else if (row.targetType === 10) {
           this.$router.push({
             name: "songSheetDetails",

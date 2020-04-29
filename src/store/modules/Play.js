@@ -14,41 +14,41 @@ const state = {
 };
 const getters = {};
 const mutations = {
-  SET_PLAY_INFO(state, data) {
+  SET_PLAY_INFO (state, data) {
     storage("playInfo", data);
     state.playInfo = data;
   },
-  SET_PLAY_DETAILS(state, data) {
+  SET_PLAY_DETAILS (state, data) {
     storage("playDetails", data);
     state.playDetails = data;
   },
-  SET_PLAY_LIST(state, data) {
+  SET_PLAY_LIST (state, data) {
     storage("playList", data);
     state.playList = data;
   },
-  SET_PLAY_URLS(state, data) {
+  SET_PLAY_URLS (state, data) {
     state.playUrls = data;
   },
-  SET_ISPLAY(state, data) {
+  SET_ISPLAY (state, data) {
     state.isPlay = data;
   },
-  SET_VOLUME(state, data) {
+  SET_VOLUME (state, data) {
     storage("volume", data);
     state.volume = data;
   },
-  SET_LOOP(state, data) {
+  SET_LOOP (state, data) {
     storage("loop", data);
     state.loop = data;
   },
-  SET_LYRIC(state, data) {
+  SET_LYRIC (state, data) {
     state.playLyric = data;
   },
-  SET_CURRENT_TIME(state, data) {
+  SET_CURRENT_TIME (state, data) {
     state.currentTime = data;
   }
 };
 const actions = {
-  async getSongUrl({ commit }, payload) {
+  async getSongUrl ({ commit }, payload) {
     let { data } = await api.musicData.getSongUrl(payload);
     if (data.code === 200) {
       storage("playUrls", data.data);
@@ -56,7 +56,7 @@ const actions = {
       return data ? data : {};
     }
   },
-  async getLyric({ commit }, payload) {
+  async getLyric ({ commit }, payload) {
     let { data } = await api.musicData.getLyric(payload);
     if (data.code === 200) {
       storage("playLyric", data);
@@ -64,12 +64,31 @@ const actions = {
       return data ? data : {};
     }
   },
-  async getSongDetails({ dispatch, commit }, payload) {
+  async getSongDetails ({ dispatch, commit, state }, payload) {
+    let playList = state.playList;
+    let playInfo = state.playInfo;
+    let playIdx = playList.findIndex(function (obj) {
+      return obj.id === playInfo.id;
+    });
+    let rowIdx = playList.findIndex(function (obj) {
+      return obj.id === payload.ids;
+    });
+    if (rowIdx >= 0) {
+      playList.splice(rowIdx, 1);
+    }
+
     let { data } = await api.musicData.getSongDetails(payload);
     if (data.code === 200) {
-      commit("SET_PLAY_INFO", data.songs[0]);
+      if (playIdx >= 0) {
+        playList.splice(playIdx + 1, 0, data.songs[0]);
+      } else {
+        playList.push(data.songs[0]);
+      }
       dispatch("getSongUrl", { id: payload.ids });
       dispatch("getLyric", { id: payload.ids });
+      commit("SET_PLAY_LIST", playList);
+      commit("SET_PLAY_INFO", data.songs[0]);
+      commit("SET_ISPLAY", true);
       return data ? data.songs[0] : {};
     }
   }

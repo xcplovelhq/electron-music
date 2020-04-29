@@ -7,7 +7,7 @@
       'border-radius': (Radius || +Size / 2) + 'px'
     }"
   >
-    <img :src="ImgUrl" alt="" />
+    <img :src="ImgUrl + `?param=${Size}y${Size}`" alt="" />
   </div>
 </template>
 

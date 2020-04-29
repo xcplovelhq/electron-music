@@ -1,7 +1,7 @@
 <template>
   <div class="g-play-list">
     <div class="m-list">
-      <div class="m-no">
+      <div class="m-no" v-if="list && list <= 0">
         <h3>你还没有添加任何歌曲</h3>
         <p>去首页<span @click="handleFind">发现音乐</span></p>
       </div>
@@ -95,13 +95,13 @@ export default {
           like: !status
         })
         .then(({ data }) => {
-          this.getUserLikelist({ uid: 397132873 }).then(data => {
-            console.log(data.ids);
-            // this.$store.commit("GET_USER_LIKE_LIST", data.ids);
-          });
           console.log(data);
+
+          // this.getUserLikelist({ uid: 397132873 }).then(data => {
+          //   console.log(data);
+          //   // this.$store.commit("GET_USER_LIKE_LIST", data.ids);
+          // });
         });
-      console.log(status);
     },
     getSongName(item, idx) {
       if (idx > 0) {
@@ -157,6 +157,10 @@ export default {
     }
     &:hover {
       background: #f2f2f3;
+      .m-song-name,
+      .m-name a {
+        color: #000;
+      }
     }
     &.active {
       background: #f0f0f0;
@@ -217,9 +221,6 @@ export default {
       a {
         font-size: 12px;
         color: #717171;
-        &:hover {
-          color: #444;
-        }
         &.active {
           color: @brand-color;
         }

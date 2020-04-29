@@ -8,62 +8,71 @@
           @click="handleClick(i)"
           :class="{ active: id == i.id }"
         >
-          <div class="m-num">
-            <template v-if="getPlayStatus(i)">
-              <i class="iconfont" v-if="$store.state.Play.isPlay">&#xe610;</i>
-              <i class="iconfont" v-else>&#xe60f;</i>
-            </template>
-            <template v-else>
-              {{ getSum(idx + 1) }}
-            </template>
-          </div>
-          <i
-            class="iconfont active"
-            v-if="getIsLike(i)"
-            @click="handleLike(true, i)"
-            >&#xeca2;</i
-          >
-          <i class="iconfont" v-else @click="handleLike(false, i)">&#xeca1;</i>
-          <i class="iconfont i-download">&#xe675;</i>
+          <div class="m-item">
+            <div class="m-num">
+              <template v-if="getPlayStatus(i)">
+                <i class="iconfont" v-if="$store.state.Play.isPlay">&#xe610;</i>
+                <i class="iconfont" v-else>&#xe60f;</i>
+              </template>
+              <template v-else>
+                {{ getSum(idx + 1) }}
+              </template>
+            </div>
+            <i
+              class="iconfont active"
+              v-if="getIsLike(i)"
+              @click="handleLike(true, i)"
+              >&#xeca2;</i
+            >
+            <i class="iconfont" v-else @click="handleLike(false, i)"
+              >&#xeca1;</i
+            >
+            <i class="iconfont i-download">&#xe675;</i>
 
-          <div class="m-song-name">
-            <span
-              :class="{
-                active: getPlayStatus(i),
-                'z-ls': (i.fee == 0 && i.st < 0) || i.fee == 1
-              }"
-              >{{ i.name }}</span
-            >
-            <span class="m-text" v-if="i.alia && i.alia.length > 0"
-              >（{{ i.alia[0] }}）</span
-            >
+            <div class="m-song-name">
+              <span
+                :class="{
+                  active: getPlayStatus(i),
+                  'z-ls': (i.fee == 0 && i.st < 0) || i.fee == 1
+                }"
+                >{{ i.name }}</span
+              >
+              <span class="m-text" v-if="i.alia && i.alia.length > 0"
+                >（{{ i.alia[0] }}）</span
+              >
+            </div>
+            <div class="m-name" v-if="isShowSinger">
+              <router-link
+                v-for="(v, idx) in i.ar || i.artists"
+                :key="v.id"
+                :to="{
+                  name: 'singerDetails',
+                  query: { id: v.id }
+                }"
+                >{{ getSongName(v, idx) }}</router-link
+              >
+            </div>
+            <div class="m-album" v-if="isShowAlbum">
+              <router-link
+                :to="{
+                  name: 'songSheetDetails',
+                  query: {
+                    id: (i.al && i.al.id) || (i.alias && i.alias.id),
+                    type: 'album'
+                  }
+                }"
+                >{{
+                  (i.al && i.al.name) || (i.album && i.album.name)
+                }}</router-link
+              >
+            </div>
+            <div class="m-time">{{ getTime(i) }}</div>
           </div>
-          <div class="m-name" v-if="isShowSinger">
-            <router-link
-              v-for="(v, idx) in i.ar || i.artists"
-              :key="v.id"
-              :to="{
-                name: 'singerDetails',
-                query: { id: v.id }
-              }"
-              >{{ getSongName(v, idx) }}</router-link
-            >
-          </div>
-          <div class="m-album" v-if="isShowAlbum">
-            <router-link
-              :to="{
-                name: 'songSheetDetails',
-                query: {
-                  id: (i.al && i.al.id) || (i.alias && i.alias.id),
-                  type: 'album'
-                }
-              }"
-              >{{
-                (i.al && i.al.name) || (i.album && i.album.name)
-              }}</router-link
-            >
-          </div>
-          <div class="m-time">{{ getTime(i) }}</div>
+          <div
+            v-if="i.lyrics"
+            class="m-lyric"
+            v-html="getDescribe(i.lyrics.txt)"
+          ></div>
         </li>
       </template>
     </ul>
@@ -72,7 +81,6 @@
 
 <script>
 import Moment from "moment";
-import { getStorage } from "@/lib/store";
 import { mapActions } from "vuex";
 export default {
   props: {
@@ -83,6 +91,12 @@ export default {
       type: Array,
       default() {
         return [];
+      }
+    },
+    type: {
+      type: String,
+      default() {
+        return "";
       }
     },
     isShowSinger: {
@@ -99,6 +113,9 @@ export default {
       id: 0,
       info: {}
     };
+  },
+  created() {
+    console.log(this.$route.query.text);
   },
   watch: {
     list() {
@@ -120,6 +137,17 @@ export default {
     handleClick(row) {
       this.id = row.id;
     },
+    getDescribe(v) {
+      let text = v.substring(v.indexOf(this.$route.query.text));
+      let reg = /[\r\n]/g;
+      let rep = new RegExp(this.$route.query.text, "g");
+      let resDtring = `<span style='color:#7992B9;'>${this.$route.query.text}</span>`;
+      text = text.split("\n");
+      text.length = 4;
+      text = text.join("\n");
+      text = text.replace(rep, resDtring);
+      return text && text.replace(reg, "<br />");
+    },
     handledbClick(row) {
       let list = [];
       if (row.fee == 0 && row.st < 0) {
@@ -140,23 +168,25 @@ export default {
       //     id: this.info.tracks.map(item => item.id)
       //   });
       // }SET_PLAY_LIST
-      this.info.tracks.forEach(item => {
-        if ((item.fee == 0 && item.st < 0) || item.fee == 1) {
-          return;
-        } else {
-          list.push(item);
-        }
-      });
-      console.log(list);
+      if (this.type !== "search") {
+        this.info.tracks.forEach(item => {
+          if ((item.fee == 0 && item.st < 0) || item.fee == 1) {
+            return;
+          } else {
+            list.push(item);
+          }
+        });
 
-      this.getSongUrl({
-        id: this.info.tracks.map(item => item.id)
-      });
-      this.$store.commit("SET_PLAY_LIST", list);
-      this.$store.dispatch("getLyric", { id: row.id });
-      this.$store.commit("SET_PLAY_DETAILS", this.info);
-      this.$store.commit("SET_ISPLAY", true);
-      console.log(getStorage());
+        this.getSongUrl({
+          id: this.info.tracks.map(item => item.id)
+        });
+        this.$store.commit("SET_PLAY_LIST", list);
+        this.$store.dispatch("getLyric", { id: row.id });
+        this.$store.commit("SET_PLAY_DETAILS", this.info);
+        this.$store.commit("SET_ISPLAY", true);
+      } else {
+        this.$store.dispatch("getSongDetails", { ids: row.id });
+      }
     },
     handleLike(status, row) {
       this.$api.musicData
@@ -172,7 +202,6 @@ export default {
           });
           console.log(data);
         });
-      console.log(status);
     },
     getPlayStatus(row) {
       if (
@@ -211,12 +240,14 @@ export default {
 <style lang="less">
 .g-song-list {
   li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 34px;
-    padding: 0 5px 0 30px;
-    cursor: default;
+    .m-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 34px;
+      padding: 0 5px 0 30px;
+      cursor: default;
+    }
     &:nth-child(2n -1) {
       background: #fafafa;
     }
@@ -285,6 +316,11 @@ export default {
           color: #444;
         }
       }
+    }
+    .m-lyric {
+      line-height: 1.5;
+      padding: 5px 120px 20px;
+      font-size: 12px;
     }
     .m-album {
       min-width: 185px;

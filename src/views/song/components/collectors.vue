@@ -1,7 +1,12 @@
 <template>
   <div class="g-collectors">
     <ul>
-      <router-link tag="li" to="" v-for="item in list" :key="item.id">
+      <router-link
+        tag="li"
+        :to="{ name: 'userDetails', query: { id: item.userId } }"
+        v-for="item in list"
+        :key="item.id"
+      >
         <avata :ImgUrl="item.avatarUrl" Size="88"></avata>
         <div class="m-info">
           <h3>{{ item.nickname }}</h3>

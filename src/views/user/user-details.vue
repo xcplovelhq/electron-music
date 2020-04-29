@@ -12,10 +12,10 @@
         </div>
         <div class="flex-justify-between">
           <div class="m-medal">
-            <div class="m-musician">
+            <div class="m-musician" v-if="getMusician">
               <i class="iconfont z-small">&#xe615;</i>{{ getMusician }}
             </div>
-            <div class="m-start">
+            <div class="m-start" v-if="getStart">
               <i class="iconfont z-small">&#xe614;</i>{{ getStart }}
             </div>
             <div class="m-vip" v-if="info.vipType == 11">
@@ -287,7 +287,6 @@ export default {
           }
         }
         .iconfont {
-          margin-right: 5px;
           font-size: 14px;
           color: #666;
         }

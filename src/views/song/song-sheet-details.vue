@@ -137,7 +137,7 @@ export default {
     MyImage,
     CommentList
   },
-  data () {
+  data() {
     return {
       type: "",
       offset: 0,
@@ -148,7 +148,7 @@ export default {
       comment: {}
     };
   },
-  created () {
+  created() {
     this.type = this.$route.query.type;
     if (this.type === "album") {
       this.getAlbum();
@@ -158,34 +158,34 @@ export default {
     }
   },
   methods: {
-    getTime (time) {
+    getTime(time) {
       return Moment(time).format("YYYY-MM-DD");
     },
-    getSum (num) {
+    getSum(num) {
       if (num > 100000) {
         return (num / 10000).toFixed(0) + "万";
       } else {
         return num;
       }
     },
-    getSongName (item, idx) {
+    getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item || item;
       } else {
         return item;
       }
     },
-    getDescribe (v) {
+    getDescribe(v) {
       let reg = /[\r\n]/g;
 
       return v && v.replace(reg, "<br />");
     },
-    handleMore () {
+    handleMore() {
       this.isMore = !this.isMore;
 
       // return getSum(v);
     },
-    getPlaylistDetail () {
+    getPlaylistDetail() {
       this.isLoading = true;
       this.$api.songData
         .getPlaylistDetail({
@@ -204,7 +204,7 @@ export default {
           });
         });
     },
-    getAlbum () {
+    getAlbum() {
       this.isLoading = true;
       this.$api.albumData
         .getAlbum({

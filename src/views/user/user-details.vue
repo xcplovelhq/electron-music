@@ -30,26 +30,35 @@
             </div>
           </div>
           <div class="m-btns">
-            <div v-if="info.artistId" @click="handleClick('singer')">
-              <i class="iconfont">&#xe616;</i>歌手页
-            </div>
-            <div><i class="iconfont">&#xe60d;</i>发私信</div>
-            <div>关注</div>
-            <div><i class="iconfont">&#xe71e;</i></div>
+            <template v-if="getUserInfo.userId === info.userId">
+              <div>
+                <i class="iconfont" style="font-size:13px; margin-right: 5px"
+                  >&#xe63d;</i
+                >编辑个人信息
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="info.artistId" @click="handleClick('singer')">
+                <i class="iconfont">&#xe616;</i>歌手页
+              </div>
+              <div><i class="iconfont">&#xe60d;</i>发私信</div>
+              <div>关注</div>
+              <div class="m-last-btn"><i class="iconfont">&#xe71e;</i></div>
+            </template>
           </div>
         </div>
         <div class="m-counts">
-          <div class="m-count">
+          <div class="m-count" @click="handleClick('dynamic')">
             <h3>{{ info.eventCount }}</h3>
             <p>动态</p>
           </div>
           <div class="m-line"></div>
-          <div class="m-count">
+          <div class="m-count" @click="handleClick('follow')">
             <h3>{{ info.follows }}</h3>
             <p>关注</p>
           </div>
           <div class="m-line"></div>
-          <div class="m-count">
+          <div class="m-count" @click="handleClick('fans')">
             <h3>{{ info.followeds }}</h3>
             <p>粉丝</p>
           </div>
@@ -119,6 +128,9 @@ export default {
     this.getUserDetail();
   },
   computed: {
+    getUserInfo() {
+      return this.$store.state.User.userInfo;
+    },
     getDescribe() {
       let reg = /[\r\n]/g;
 
@@ -161,10 +173,33 @@ export default {
             query: { id: this.info.artistId }
           });
           break;
-
+        case "dynamic":
+          this.$router.push({
+            name: "userDynamic",
+            query: { id: this.info.userId }
+          });
+          break;
+        case "follow":
+          this.$router.push({
+            name: "userFollowFans",
+            query: { id: this.info.userId, type: "follow" }
+          });
+          break;
+        case "fans":
+          this.$router.push({
+            name: "userFollowFans",
+            query: { id: this.info.userId, type: "fans" }
+          });
+          break;
         default:
           break;
       }
+    },
+    handleCount() {
+      this.$router.push({
+        name: "singerDetails",
+        query: { id: this.info.artistId }
+      });
     },
     getUserDetail() {
       this.$api.userData
@@ -277,7 +312,7 @@ export default {
             vertical-align: bottom;
           }
         }
-        &:last-child {
+        &.m-last-btn {
           width: 30px;
           height: 30px;
           padding: 0;
@@ -301,6 +336,14 @@ export default {
         background: #f1f1f1;
       }
       .m-count {
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+          h3,
+          p {
+            color: #000;
+          }
+        }
       }
       h3 {
         font-size: 20px;

@@ -18,6 +18,8 @@ import Mv from "@/views/video/mv";
 import MvRankAll from "@/views/video/mv-rank-all";
 import MvAll from "@/views/video/mv-all";
 import Search from "@/views/search";
+import UserFollowFans from "@/views/user/user-follow-fans";
+import UserDynamic from "@/views/user/user-dynamic";
 Vue.use(VueRouter);
 
 const routes = [
@@ -100,6 +102,16 @@ const routes = [
         path: "search",
         name: "search",
         component: Search
+      },
+      {
+        path: "userFollowFans",
+        name: "userFollowFans",
+        component: UserFollowFans
+      },
+      {
+        path: "userDynamic",
+        name: "userDynamic",
+        component: UserDynamic
       }
     ]
   },

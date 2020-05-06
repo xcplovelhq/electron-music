@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, ipcMain, Menu } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, Menu, shell } from "electron";
 import {
   createProtocol
   /* installVueDevtools */
@@ -61,7 +61,7 @@ function openWin() {
       ? `${process.env.WEBPACK_DEV_SERVER_URL}`
       : `file://${__dirname}/index.html`;
   // win.loadURL(winURL);
-  // loginWin.webContents.openDevTools({ mode: "right" });
+  loginWin.webContents.openDevTools({ mode: "right" });
 
   loginWin.loadURL(winURL + "#/login");
   loginWin.on("closed", () => {
@@ -80,6 +80,9 @@ ipcMain.on("closeWin", (e, data) => {
 ipcMain.on("setUserInfo", (e, data) => {
   console.log(e, data);
   win.webContents.send("setUserInfoData", data);
+});
+ipcMain.on("openUrl", (e, data) => {
+  shell.openExternal(data);
 });
 // ipcMain.on("control", () => {
 //   win.webContents.send("control", "play");

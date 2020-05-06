@@ -124,8 +124,6 @@ export default {
   },
   methods: {
     handleOpen(type) {
-      console.log("");
-
       if (type === "playing") {
         this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", true);
       } else {

@@ -115,6 +115,38 @@ const getSearchSuggest = async function(data) {
   });
   return res;
 };
+// 获取用户关注
+const getUserFollows = async function(data) {
+  const res = await axios.get({
+    url: "/user/follows",
+    data
+  });
+  return res;
+};
+// 获取用户粉丝
+const getUserFolloweds = async function(data) {
+  const res = await axios.get({
+    url: "/user/followeds",
+    data
+  });
+  return res;
+};
+// 获取用户动态
+const getUserEvent = async function(data) {
+  const res = await axios.get({
+    url: "/user/event",
+    data
+  });
+  return res;
+};
+// 获取动态
+const getEvent = async function(data) {
+  const res = await axios.get({
+    url: "/event",
+    data
+  });
+  return res;
+};
 export default {
   getUserDetail,
   loginRefresh,
@@ -129,5 +161,9 @@ export default {
   getSimiUser,
   search,
   getSearchHot,
-  getSearchSuggest
+  getSearchSuggest,
+  getUserFollows,
+  getUserFolloweds,
+  getUserEvent,
+  getEvent
 };

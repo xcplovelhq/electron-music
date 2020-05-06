@@ -14,7 +14,7 @@
     /> -->
     <el-input
       ref="input"
-      class="m-input"
+      class="m-search-input"
       placeholder="搜索"
       :value="getSearchText"
       clearable
@@ -102,7 +102,7 @@ export default {
 </style>
 
 <style lang="less">
-.m-input {
+.m-search-input {
   cursor: text;
 
   .el-input__inner {

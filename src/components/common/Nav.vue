@@ -15,7 +15,7 @@
           class="m-nav-item"
           v-for="item in onlineNav"
           :key="item.key"
-          :to="{ path: item.link }"
+          :to="{ path: item.link, query: { id: user.userId, type: 'friend' } }"
           :class="{ active: item.isActive }"
         >
           <i class="iconfont" v-html="item.icon"></i>{{ item.name }}
@@ -63,7 +63,11 @@
           </router-link>
         </template>
       </div>
-      <div class="m-nav-collapse" @click="isShowCollapse = !isShowCollapse">
+      <div
+        class="m-nav-collapse"
+        v-if="songSheetList && songSheetList.length > 0"
+        @click="isShowCollapse = !isShowCollapse"
+      >
         <i class="iconfont">&#xe618;</i>收藏的歌单
       </div>
       <div class="m-nav-my" v-show="isShowCollapse">
@@ -97,7 +101,7 @@ export default {
   data() {
     return {
       isShowFound: true,
-      isShowCollapse: false,
+      isShowCollapse: true,
       onlineNav: [
         {
           name: "发现音乐",
@@ -117,7 +121,7 @@ export default {
         {
           name: "朋友",
           icon: "&#xe61a;",
-          link: "friends"
+          link: "/userDynamic"
         }
       ],
       myNav: [
@@ -155,10 +159,7 @@ export default {
   created() {
     ipcRenderer.on("setUserInfoData", () => {
       if (getStorage("userInfo")) {
-        this.$store.commit(
-          "SET_USER_INFO",
-          getStorage("userInfo") && getStorage("userInfo")
-        );
+        this.$store.commit("SET_USER_INFO", getStorage("userInfo"));
         this.getUserLikelist({
           uid: this.$store.state.User.userInfo.userId
         }).then(data => {
@@ -169,31 +170,37 @@ export default {
         }).then(data => {
           this.$store.commit("GET_USER_SONG_SHEET", data.playlist);
         });
+        this.$toasted.show("登录成功");
       }
     });
   },
   computed: {
     ...mapState({
       user: state => {
-        return getStorage("userInfo") || state.User.userInfo;
+        return state.User.userInfo;
       },
       songSheetList: state => {
-        return getStorage("likeSongSheet") || state.User.likeSongSheet;
+        return state.User.likeSongSheet;
       }
     })
   },
   methods: {
     ...mapActions(["loginCellphone", "getUserPlaylist", "getUserLikelist"]),
     handleLogin() {
-      // if (getStorage("userInfo")) {
-      //   console.log("321");
-      // } else {
-      ipcRenderer.send("openWin");
-      // }
+      if (getStorage("userInfo")) {
+        console.log("321");
+      } else {
+        ipcRenderer.send("openWin");
+      }
 
       // console.log(getStorage("userInfo"), 1111111111111);
     },
-    handleDetails() {}
+    handleDetails() {
+      this.$router.push({
+        name: "userDetails",
+        query: { id: this.user.userId }
+      });
+    }
   }
 };
 </script>
@@ -236,7 +243,7 @@ export default {
     display: flex;
     align-items: center;
     padding: 8px 18px;
-    font-size: 12px;
+    font-size: 13px;
     color: #444;
     overflow: hidden;
     white-space: nowrap;

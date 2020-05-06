@@ -68,10 +68,10 @@ const actions = {
     let playList = state.playList;
     let playInfo = state.playInfo;
     let playIdx = playList.findIndex(function (obj) {
-      return obj.id === playInfo.id;
+      return obj ? obj.id === playInfo.id : -1;
     });
     let rowIdx = playList.findIndex(function (obj) {
-      return obj.id === payload.ids;
+      return obj ? obj.id === payload.ids : -1;
     });
     if (rowIdx >= 0) {
       playList.splice(rowIdx, 1);

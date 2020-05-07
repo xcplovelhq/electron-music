@@ -6,19 +6,22 @@
           <div class="m-img">
             <Avata :ImgUrl="item.user.avatarUrl" Size="35"></Avata>
           </div>
-          <div @click="clickaa"></div>
           <div class="m-info">
             <div class="m-name">
               <router-link
                 :to="{ name: 'userDetails', query: { id: item.user.userId } }"
                 >{{ item.user.nickname }}</router-link
               >
-              {{ getType(item) }}
+              {{ getType(item.type) }}
             </div>
             <div class="m-time">
               {{ $moment(item.eventTime).format("YYYY年M月D日 kk:mm") }}
             </div>
-            <div class="m-content" v-html="getContent(item)"></div>
+            <div
+              class="m-content"
+              v-html="getContent(item)"
+              @click="handleOpenUrl($event)"
+            ></div>
             <div
               class="m-share"
               v-if="
@@ -28,59 +31,27 @@
                   item.json.event ||
                   item.isShowPic
               "
-              @click="handleClick(item)"
               :class="{ 'z-font': item.type == 36 }"
             >
-              <div class="flex-justify-start">
-                <div class="m-avata-bg" v-if="item.json.album">
-                  <my-image
-                    :ImgUrl="item.json.album.picUrl"
-                    IconSize="40px"
-                    Size="85%"
-                    Radius="8"
-                    :isHover="true"
-                  ></my-image>
+              <share-box :row="item" v-if="!item.json.event"></share-box>
+              <div v-if="item.json.event" class="m-share-event">
+                <div class="m-name">
+                  <div
+                    class="m-content"
+                    v-html="getContent(item.json.event, 'event')"
+                  ></div>
                 </div>
-                <my-image
-                  v-if="getShareImg(item.json)"
-                  :ImgUrl="getShareImg(item.json)"
-                  Size="40px"
-                  IconSize="20px"
-                  Radius="4"
-                ></my-image>
-                <div class="m-share-info" v-if="item.json.song">
-                  <div class="m-song-name">
-                    {{ item.json.song.name
-                    }}{{
-                      item.json.song.alias[0] &&
-                        "（" + item.json.song.alias[0] + "）"
-                    }}
-                  </div>
-                  <div class="m-singer-name">
-                    <span
-                      v-for="(i, key) in item.json.song.artists"
-                      :key="key"
-                      >{{ getSongName(i, key) }}</span
-                    >
-                  </div>
-                </div>
-                <div class="m-share-info" v-else-if="item.json.resource">
-                  <div class="m-singer-name">
-                    歌手：{{ item.json.resource.name }}
-                  </div>
-                </div>
-                <div class="m-share-info" v-else-if="item.json.album">
-                  <div class="m-song-name">
-                    {{ item.json.album.name }}
-                  </div>
-                  <div class="m-singer-name">
-                    <span
-                      v-for="(i, key) in item.json.album.artists"
-                      :key="key"
-                      >{{ getSongName(i, key) }}</span
-                    >
-                  </div>
-                </div>
+                <share-box
+                  :row="item.json.event"
+                  class="m-share-event-box"
+                ></share-box>
+                <pics
+                  v-show="!item.isShowPic"
+                  :row="item.json.event"
+                  @hanldeEnlarge="
+                    (pic, row, idx) => hanldeEnlarge(pic, row, idx, item)
+                  "
+                ></pics>
               </div>
               <div class="m-enlarge-pic" v-show="item.isShowPic">
                 <div class="m-handle">
@@ -93,9 +64,8 @@
                   </div>
                   <!-- <div @click="lookEnlarge(index)">下载</div> -->
                 </div>
-                <Loading v-if="isLoading" style="margin-top:100px;"></Loading>
-
-                <div class="m-enlarge-img">
+                <!-- <Loading v-if="isLoading" style="margin-top:100px;"></Loading> -->
+                <div class="m-enlarge-img" v-if="item.showPic">
                   <el-image
                     ref="elImage"
                     fit="fill"
@@ -122,32 +92,61 @@
                 </div>
               </div>
             </div>
+            <div class="m-enlarge-mv" v-if="item.isShowMv">
+              <div class="m-handle">
+                <div @click="handleRetract(index)">
+                  <i class="el-icon-upload2"></i>收起
+                </div>
+                <el-divider direction="vertical"></el-divider>
+                <div @click="handleMvTitle(item)" class="m-enlarge-title">
+                  <div>
+                    <i class="iconfont">&#xe60c;</i>{{ item.json.mv.name }} -
+                  </div>
+                  <span
+                    @click.stop.prevent="handleGoSinger(i)"
+                    v-for="(i, key) in item.json.mv.artists"
+                    :key="key"
+                    >{{ getSongName(i, key) }}</span
+                  >
+                </div>
+                <!-- <div @click="lookEnlarge(index)">下载</div> -->
+              </div>
+              <my-video
+                v-if="item.json.mv"
+                :id="item.json.mv.id"
+                :type="item.type === 21 ? 'mv' : 'video'"
+              ></my-video>
+            </div>
+            <pics
+              :row="item"
+              @hanldeEnlarge="
+                (pic, row, idx) => hanldeEnlarge(pic, row, idx, item)
+              "
+            ></pics>
             <div
-              class="m-pics"
-              v-show="item.pics && item.pics.length > 0 && !item.isShowPic"
+              class="m-share-mv"
+              v-if="item.json.mv && !item.isShowMv"
+              @click="handleMv(item)"
             >
-              <div
-                class="m-pic"
-                :style="{ width: item.pics.length > 1 ? '120px' : 'auto' }"
-                v-for="(v, idx) in item.pics"
-                :key="idx"
-                @click="hanldeEnlarge(v, item, idx)"
-              >
-                <my-image
-                  v-if="item.pics.length > 1"
-                  :ImgUrl="v.pcSquareUrl"
-                  Size="100%"
-                  Radius="8"
-                ></my-image>
-                <el-image
-                  v-else
-                  :src="v.originUrl"
-                  style="vertical-align: top;"
-                ></el-image>
-                <div class="m-tips" v-if="v.height > 2000">长图</div>
+              <el-image
+                :src="item.json.mv && item.json.mv.imgurl16v9"
+              ></el-image>
+              <div class="m-mv-title" @click="handleMvTitle(item)">
+                {{ item.json.mv.name }} -
+                <span v-for="(i, key) in item.json.mv.artists" :key="key">{{
+                  getSongName(i, key)
+                }}</span>
+              </div>
+              <div class="m-play-btn"></div>
+              <div class="m-play-num">
+                <i class="iconfont">&#xe607;</i
+                >{{ getSumData(item.json.mv.playCount) }}
+              </div>
+              <div class="m-mv-time">
+                {{ $moment(item.json.mv.duration).format("mm:ss") }}
               </div>
             </div>
-            <div class="m-otder">
+            <div class="m-order">
               <div class="i-zan">
                 <i class="iconfont">&#xe611;</i>{{ item.info.likedCount }}
               </div>
@@ -190,49 +189,57 @@
 
 <script>
 import Avata from "@/components/Avata";
-import MyImage from "@/components/Image";
-import Loading from "@/components/Loading";
+// import Loading from "@/components/Loading";
 import { ipcRenderer } from "electron";
+import ShareBox from "./components/share";
+import Pics from "./components/pics";
+import MyVideo from "@/components/Video";
+import { getSum } from "@/lib/utils";
 
 export default {
   components: {
     Avata,
-    MyImage,
-    Loading
+    // Loading,
+    ShareBox,
+    Pics,
+    MyVideo
   },
-  data() {
+  data () {
     return {
       isLoading: false,
       list: [],
       lasttime: -1
     };
   },
-  created() {
+  created () {
     this.getData();
   },
   methods: {
-    getSongName(item, idx) {
+    getSumData (time) {
+      return getSum(time);
+    },
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    clickaa() {
+    clickaa () {
       ipcRenderer.send("openUrl", "http://www.baidu.com");
     },
-    getShareImg(row) {
-      if (row.song) {
-        return row.song.album && row.song.album.picUrl;
-      } else if (row.resource) {
-        return row.resource.picUrl;
-      }
-    },
-    getType(row) {
+
+    getType (type) {
       let text = "";
-      switch (row.type) {
+      switch (type) {
         case 18:
           text = "分享单曲";
+          break;
+        case 21:
+          text = "分享MV";
+          break;
+        case 22:
+          text = "转发";
           break;
         case 35:
           text = "发布动态";
@@ -245,55 +252,59 @@ export default {
       }
       return text;
     },
-    getImgLoad() {
+    getImgLoad () {
       this.isLoading = false;
     },
-    getContent(row) {
-      let msg = "";
+    getContent (row, type) {
+      let msg = row.json.msg || "";
       let reg = /[\r\n]/g;
       let rep = new RegExp("#" + row.actName + "#", "g");
       let resDtring = `<span class="m-hover">#${row.actName}#</span>`;
-      msg = row.json.msg ? row.json.msg.replace(rep, resDtring) : "";
-      msg = msg ? this.remind(msg) : "";
+      if (type === "event") {
+        msg =
+          "@" +
+          row.user.nickname +
+          " " +
+          this.getType(row.type) +
+          "：" +
+          row.json.msg;
+      }
+      msg = msg ? this.remind(msg, type) : "";
+      msg = msg.replace(rep, resDtring);
+      msg = this.changeUrl(msg);
       return msg.replace(reg, "</br>");
     },
-    remind(s) {
-      let msg = "";
+    remind (s) {
+      let msg = s || "";
       if (typeof s != "string") return false;
-      // var reg = /@([^\f\n\r\t\v\s\[\]]+)\s?/g;
-      let reg = /@([0-9a-zA-Z\u4e00-\u9fa5]+)\s?/g;
-      if (s.match(reg) && s.match(reg).length > 0) {
-        s.match(reg).forEach(item => {
-          msg = s.replace(reg, `<span class="m-hover">${item}</span>`);
+      let reg = /@([0-9a-zA-Z\u4e00-\u9fa5]+)\s+?/g;
+      if (msg.match(reg) && msg.match(reg).length > 0) {
+        msg.match(reg).forEach(item => {
+          msg = msg.replace(
+            new RegExp(item, "g"),
+            `<span class="m-hover">${item}</span>`
+          );
         });
       }
       return msg || s;
     },
+    changeUrl (s) {
+      let reg = /(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/;
+      let resDtring = `<a class="m-hover" url="${s.match(reg) &&
+        s.match(
+          reg
+        )[0]}" @click="clickaa"><i class="iconfont">&#xe6d4;</i>网页链接</a>`;
+      return s.replace(reg, resDtring);
+    },
 
-    handleClick(row) {
-      if (row.isShowPic) {
-        return;
-      }
-      if (row.json.song) {
-        this.$store.dispatch("getSongDetails", { ids: row.json.song.id });
-      } else if (row.json.resource) {
-        this.$router.push({
-          name: "singerDetails",
-          query: { id: row.json.resource.id }
-        });
-      } else if (row.json.album) {
-        this.$router.push({
-          name: "songSheetDetails",
-          query: { id: row.json.album.id, type: "album" }
-        });
-      }
+    hanldeEnlarge (pic, row, idx, item) {
+      this.isLoading = true;
+      item.isShowPic = true;
+      item.showPic = pic.originUrl;
+      item.picIdx = idx;
     },
-    hanldeEnlarge(item, row, idx) {
-      row.isShowPic = true;
-      row.showPic = item.originUrl;
-      row.picIdx = idx;
-    },
-    handleReduce(row, type) {
+
+    handleReduce (row, type) {
       this.isLoading = true;
       switch (type) {
         case "left":
@@ -311,10 +322,29 @@ export default {
           break;
       }
     },
-    lookEnlarge(idx) {
+    lookEnlarge (idx) {
       this.$refs.elImage[idx] && this.$refs.elImage[idx].clickHandler();
     },
-    getData() {
+    handleOpenUrl (event) {
+      if (event.target.nodeName === "A") {
+        ipcRenderer.send("openUrl", event.target.attributes.url.value);
+      }
+    },
+    handleMv (item) {
+      item.isShowMv = true;
+      // item.showPic = pic.originUrl;
+      // item.picIdx = idx;
+    },
+    handleMvTitle (row) {
+      this.$router.push({
+        name: "mvDetails",
+        query: { id: row.json.mv.id, type: row.type === 21 ? "mv" : "video" }
+      });
+    },
+    handleGoSinger (row) {
+      this.$router.push({ name: "singerDetails", query: { id: row.id } });
+    },
+    getData () {
       this.list = [];
       if (this.$route.query.type === "friend") {
         this.$api.userData
@@ -325,10 +355,16 @@ export default {
           .then(({ data }) => {
             data.event.forEach(item => {
               item.json = JSON.parse(item.json);
+              if (item.json.event) {
+                item.json.event.json = JSON.parse(item.json.event.json);
+              }
+              if (item.json.mv) {
+                item.isShowMv = false;
+              }
+              item.picsList = [];
+              item.isShowPic = false;
+              item.showPic = "";
               if (item.pics && item.pics.length > 0) {
-                item.picsList = [];
-                item.isShowPic = false;
-                item.showPic = "";
                 item.pics.forEach(v => {
                   item.picsList.push(v.originUrl);
                 });
@@ -346,10 +382,16 @@ export default {
           .then(({ data }) => {
             data.events.forEach(item => {
               item.json = JSON.parse(item.json);
+              if (item.json.event) {
+                item.json.event.json = JSON.parse(item.json.event.json);
+              }
+              if (item.json.mv) {
+                item.isShowMv = false;
+              }
+              item.picsList = [];
+              item.isShowPic = false;
+              item.showPic = "";
               if (item.pics && item.pics.length > 0) {
-                item.picsList = [];
-                item.isShowPic = false;
-                item.showPic = "";
                 item.pics.forEach(v => {
                   item.picsList.push(v.originUrl);
                 });
@@ -448,7 +490,6 @@ export default {
         .m-share {
           margin-top: 8px;
           margin-bottom: 18px;
-          padding: 10px 8px;
           border-radius: 8px;
           background: #f5f5f5;
           &.z-font {
@@ -458,29 +499,110 @@ export default {
               color: #333;
             }
           }
-          &:hover {
-            background: #eee;
+        }
+        .m-share-event {
+          padding: 8px 10px;
+          cursor: pointer;
+          .m-name {
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 12px;
+          }
+          .m-content {
+            font-size: 12px;
           }
         }
-        .m-share-info {
-          margin-left: 5px;
-
-          .m-song-name {
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #555;
+        .m-share-event-box {
+          margin-top: 8px;
+          padding: 8px 8px;
+          border-radius: 8px;
+          background: #fff;
+        }
+        .m-share-mv {
+          position: relative;
+          width: 368px;
+          height: 200px;
+          margin-top: 10px;
+          border-radius: 8px;
+          overflow: hidden;
+          .m-mv-title {
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            left: 0%;
+            top: 5%;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
+            cursor: pointer;
+            &:hover {
+              color: #fff;
+            }
+            span {
+              font-size: 13px;
+            }
           }
-          .m-singer-name {
+          .m-play-btn {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.3s linear;
+            transform: translate(-50%, -50%);
+            background: url("../../assets/play.png");
+            background-size: cover;
+          }
+          .m-play-num {
+            position: absolute;
+            left: 5px;
+            bottom: 5px;
             font-size: 12px;
-            color: #a0a0a0;
+            color: #fff;
+            z-index: 100;
+            background: linear-gradient(
+              rgba(0, 0, 0, 0.3),
+              rgba(129, 118, 118, 0)
+            );
+            .iconfont {
+              font-size: 12px;
+              margin-right: 3px;
+            }
+          }
+          .m-mv-time {
+            position: absolute;
+            right: 5px;
+            bottom: 5px;
+            z-index: 100;
+            font-size: 12px;
+            color: #fff;
           }
         }
-
+        .m-enlarge-mv {
+          margin-top: 10px;
+          .m-enlarge-title {
+            display: flex;
+            div {
+              color: #7d7d7d;
+              &:hover {
+                color: #545454;
+              }
+            }
+            span {
+              color: #aaa;
+              &:hover {
+                color: #545454;
+              }
+            }
+          }
+        }
         .m-enlarge-pic {
           margin-top: 10px;
           min-height: 200px;
@@ -517,38 +639,12 @@ export default {
           font-size: 12px;
           color: #909090;
         }
-        .m-pics {
-          display: flex;
-          flex-wrap: wrap;
-          width: 370px;
-          margin-top: 10px;
-          .m-pic {
-            position: relative;
-            width: 120px;
-            margin: 0 4px 4px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: -webkit-zoom-in;
-            &:nth-child(3n) {
-              margin: 0 0 4px 0;
-            }
-          }
-          .m-tips {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            font-size: 12px;
-            color: #fff;
-            padding: 0px 4px;
-            border: 1px solid #fff;
-            border-radius: 50px;
-            background: rgba(0, 0, 0, 0.5);
-          }
-        }
+
         .m-handle {
           display: flex;
           align-items: center;
           margin-bottom: 10px;
+          padding: 0 10px;
           div {
             font-size: 14px;
             i {
@@ -556,9 +652,10 @@ export default {
             }
           }
         }
-        .m-otder {
+        .m-order {
           display: flex;
           justify-content: flex-end;
+          margin-top: 10px;
           font-size: 12px;
           color: #939393;
           div {
@@ -587,6 +684,9 @@ export default {
     cursor: pointer;
     &:hover {
       color: #4c6eb8;
+    }
+    .iconfont {
+      vertical-align: bottom;
     }
   }
 }

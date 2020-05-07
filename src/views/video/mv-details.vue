@@ -5,7 +5,7 @@
       <div class="g-warper">
         <div class="m-details">
           <div class="m-back"><i class="iconfont">&#xe617;</i>视频详情</div>
-          <div
+          <!-- <div
             class="m-video"
             ref="videoContainer"
             :class="{ 'm-isfull': isFull }"
@@ -69,7 +69,8 @@
                 :show-tooltip="false"
               ></el-slider>
             </div>
-          </div>
+          </div> -->
+          <my-video :id="$route.query.id" :type="$route.query.type"></my-video>
           <div class="m-name">
             <div class="m-username">
               <router-link to="">
@@ -134,9 +135,10 @@ import GHeader from "@/components/common/Header";
 import MvImage from "@/components/MvImage";
 import Avata from "@/components/Avata";
 import CommentList from "@/components/CommentList";
+import MyVideo from "@/components/Video";
 
 export default {
-  components: { GHeader, MvImage, Avata, CommentList },
+  components: { GHeader, MvImage, Avata, CommentList, MyVideo },
   data() {
     return {
       info: {},
@@ -151,8 +153,6 @@ export default {
     };
   },
   created() {
-    console.log(this.$route.query.type);
-
     if (this.$route.query.type === "video") {
       this.getVideoDetail();
       this.getVideoUrl();
@@ -284,62 +284,10 @@ export default {
     padding: 15px 30px;
   }
   .m-details {
+    flex: 1;
     .m-back {
       .iconfont {
         margin-right: 5px;
-      }
-    }
-    .m-video {
-      position: relative;
-      width: 620px;
-      height: 349px;
-      margin-top: 20px;
-      video {
-        width: 100%;
-        height: 100%;
-        border-radius: 8px;
-        // object-fit: cover;
-        background: #000;
-      }
-      .m-play {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 70px;
-        height: 70px;
-        transform: translate(-50%, -50%);
-        img {
-          width: 100%;
-          height: 100%;
-        }
-      }
-      .m-controls {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        height: 43px;
-        z-index: 10000000;
-        .m-time {
-          padding-left: 12px;
-          span {
-            font-size: 13px;
-            &:first-child {
-              color: rgba(255, 255, 255, 0.6);
-            }
-            &:last-child {
-              color: rgba(255, 255, 255, 0.3);
-            }
-          }
-        }
-      }
-      &.m-isfull {
-        .m-controls {
-          height: 50px;
-        }
       }
     }
     .m-name {
@@ -428,118 +376,6 @@ export default {
           margin-right: 5px;
         }
       }
-    }
-  }
-}
-</style>
-
-<style lang="less">
-.g-mv-details {
-  .m-slider {
-    position: absolute;
-    left: 0;
-    bottom: -8px;
-    width: 100%;
-    padding: 0 5px;
-    .el-slider {
-      &:hover {
-        .el-slider__button {
-          display: inline-block;
-        }
-      }
-    }
-    .el-slider__runway {
-      margin: 0;
-      height: 10px;
-      background: transparent;
-      cursor: default;
-    }
-    .el-slider__bar {
-      background: @brand-color;
-      height: 2px;
-    }
-    .el-slider__button-wrapper {
-      top: -17px;
-      cursor: default;
-    }
-    .el-slider__button {
-      display: none;
-      width: 11px;
-      height: 11px;
-      background: @brand-color;
-      border: 0;
-      cursor: default;
-    }
-  }
-  .m-order {
-    display: flex;
-    padding: 0 15px;
-    .iconfont {
-      cursor: pointer;
-      font-size: 18px;
-      color: #fff;
-    }
-    .m-full {
-      margin-left: 20px;
-      .iconfont {
-        font-size: 17px;
-      }
-    }
-  }
-  .m-isfull {
-    .m-slider {
-      bottom: 50px;
-      .el-slider {
-        height: 10px;
-      }
-      .el-slider__runway {
-        background: #707070;
-      }
-      .el-slider__button {
-        display: inline-block;
-      }
-      .el-slider__runway {
-        height: 3px;
-      }
-      .el-slider__bar {
-        height: 3px;
-      }
-    }
-  }
-}
-.m-mv-pop {
-  background: rgba(0, 0, 0, 0.5) !important;
-  border: 0 !important;
-  .m-volume-slider {
-    .el-slider__runway {
-      background: rgba(255, 255, 255, 0.5) !important;
-    }
-  }
-  .el-popover {
-    min-width: auto !important;
-    .el-slider.is-vertical .el-slider__runway {
-      margin: 0;
-    }
-    .el-slider.is-vertical .el-slider__bar,
-    .el-slider.is-vertical .el-slider__runway {
-      width: 4px;
-    }
-    .el-slider.is-vertical .el-slider__bar {
-      background: @brand-color;
-    }
-    &[x-placement^="top"] .popper__arrow::after {
-      border-top-color: rgba(0, 0, 0, 0.5) !important;
-    }
-    .el-slider__button-wrapper {
-      width: 34px;
-      height: 34px;
-    }
-
-    .el-slider__button {
-      width: 9px;
-      height: 9px;
-      border: 0;
-      background: @brand-color;
     }
   }
 }

@@ -18,8 +18,11 @@
       </div>
       <div class="m-controls">
         <div class="m-time">
-          <span>{{ $moment(currentTime * 1000).format("mm:ss") }}</span>
-          <span> / {{ $moment(duration * 1000).format("mm:ss") }}</span>
+          <span>{{ getCurrentTime }}</span>
+          <span>
+            /
+            {{ getDurationVal }}</span
+          >
         </div>
         <div class="m-order">
           <el-popover
@@ -91,6 +94,26 @@ export default {
   mounted() {
     this.video = this.$refs.video;
     this.volume = this.$store.state.Play.volume;
+  },
+  computed: {
+    getDurationVal() {
+      let startTime = this.$moment(0);
+
+      return (
+        this.$moment(this.duration * 1000).diff(startTime, "minutes") +
+        ":" +
+        this.$moment(this.duration * 1000).format("ss")
+      );
+    },
+    getCurrentTime() {
+      let startTime = this.$moment(0);
+
+      return (
+        this.$moment(this.currentTime * 1000).diff(startTime, "minutes") +
+        ":" +
+        this.$moment(this.currentTime * 1000).format("ss")
+      );
+    }
   },
   methods: {
     getDuration(e) {

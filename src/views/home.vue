@@ -84,7 +84,7 @@ import PlayList from "@/views/drawer/drawer-play-list";
 import Message from "@/views/drawer/message";
 import Playing from "@/views/drawer/playing";
 import SearchBox from "@/views/drawer/search-box";
-
+import Swiper from "swiper";
 import { getStorage } from "@/lib/store";
 
 export default {
@@ -99,12 +99,20 @@ export default {
     SearchBox
   },
   data() {
-    return {};
+    return {
+      mySwiper: null
+    };
   },
   created() {
     console.log(getStorage());
     this.getData();
     // deleteStorage("playList");
+  },
+  mounted() {
+    this.mySwiper = new Swiper(".swiper-container", {
+      direction: "vertical", // 垂直切换选项
+      mousewheel: true
+    });
   },
   computed: {
     key() {
@@ -145,6 +153,9 @@ export default {
 </script>
 
 <style lang="less">
+.swiper-slide {
+  overflow-y: auto;
+}
 .g-main {
   display: flex;
   height: calc(100% - 110px);

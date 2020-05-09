@@ -1,6 +1,7 @@
 <template>
   <div class="g-loading">
     <div class="loader double-circle"></div>
+    <slot></slot>
   </div>
 </template>
 
@@ -14,7 +15,6 @@ The loaders use CSS custom properties (variables) to control the attributes of t
 */
 .g-loading {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 30px;

@@ -10,7 +10,7 @@
               @click="handleClick(item, i)"
               :class="{ active: item.value == i.index }"
             >
-              {{ i.name }}
+              {{ i.name }}；
             </div>
           </li>
         </ul>

@@ -28,7 +28,9 @@
       </div>
     </div>
     <div class="m-share-info" v-else-if="row.json.resource">
-      <div class="m-singer-name">歌手：{{ row.json.resource.name }}</div>
+      <div class="m-singer-name m-resource">
+        歌手：{{ row.json.resource.name }}
+      </div>
     </div>
     <div class="m-share-info" v-else-if="row.json.album">
       <div class="m-song-name">
@@ -38,6 +40,14 @@
         <span v-for="(i, key) in row.json.album.artists" :key="key">{{
           getSongName(i, key)
         }}</span>
+      </div>
+    </div>
+    <div class="m-share-info" v-else-if="row.json.playlist">
+      <div class="m-song-name">
+        <span class="m-medal">歌单</span>{{ row.json.playlist.name }}
+      </div>
+      <div class="m-singer-name">
+        by {{ row.json.playlist.creator.nickname }}
       </div>
     </div>
   </div>
@@ -54,21 +64,23 @@ export default {
     row: Object
   },
   methods: {
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    getShareImg(row) {
+    getShareImg (row) {
       if (row.song) {
         return row.song.album && row.song.album.picUrl;
       } else if (row.resource) {
         return row.resource.picUrl;
+      } else if (row.playlist) {
+        return row.playlist.coverImgUrl;
       }
     },
-    handleClick() {
+    handleClick () {
       if (this.row.isShowPic) {
         return;
       }
@@ -101,6 +113,9 @@ export default {
     background: #eee;
   }
   .m-share-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     margin-left: 5px;
 
     .m-song-name {
@@ -112,10 +127,22 @@ export default {
       display: -webkit-box;
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
+      .m-medal {
+        margin-right: 10px;
+        padding: 0px 5px;
+        font-size: 10px;
+        color: #eb8a87;
+        border: 1px solid #eb8a87;
+        border-radius: 3px;
+      }
     }
     .m-singer-name {
       font-size: 12px;
       color: #a0a0a0;
+    }
+    .m-resource {
+      font-size: 14px;
+      color: #333;
     }
   }
   .m-avata-bg {

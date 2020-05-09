@@ -1,8 +1,9 @@
 <template>
   <div class="g-title">
-    <router-link :to="to"
+    <router-link :to="to" v-if="to && to.name"
       >{{ title }}<i class="iconfont">&#xe72b;</i></router-link
     >
+    <span v-else>{{ title }}<i class="iconfont">&#xe72b;</i></span>
   </div>
 </template>
 
@@ -15,7 +16,7 @@ export default {
     },
     to: {
       type: Object,
-      default() {
+      default () {
         return {};
       }
     }

@@ -37,10 +37,10 @@ export default {
   },
 
   methods: {
-    hanldeEnlarge(item, row, idx) {
+    hanldeEnlarge (item, row, idx) {
       this.$emit("hanldeEnlarge", item, row, idx);
     },
-    getWidth(item) {
+    getWidth (item) {
       if (this.row.pics.length > 1) {
         return "120px";
       } else {
@@ -51,22 +51,22 @@ export default {
         }
       }
     },
-    getHeight(item) {
+    getHeight (item) {
       if (this.row.pics.length > 1) {
         return "auto";
       } else {
-        if (item.height > 2000) {
+        if (item.height > 2000 && item.width < item.height) {
           return "420px";
         } else {
           return "100%";
         }
       }
     },
-    getPosition(v) {
+    getPosition (v) {
       if (this.row.pics.length > 1) {
         return false;
       } else {
-        if (v.height > 2000) {
+        if (v.height > 2000 && v.width < v.height) {
           return true;
         } else {
           return false;

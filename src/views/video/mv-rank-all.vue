@@ -45,7 +45,7 @@ export default {
     MvRank,
     Loading
   },
-  data () {
+  data() {
     return {
       time: "",
       a: true,
@@ -54,19 +54,19 @@ export default {
     };
   },
   computed: {
-    mvGroup () {
+    mvGroup() {
       return this.$store.state.mvArea;
     }
   },
-  created () {
+  created() {
     this.getTopMv();
   },
   methods: {
-    handleClick (row) {
+    handleClick(row) {
       this.newMvRankValue = row;
       this.getTopMv();
     },
-    getTopMv () {
+    getTopMv() {
       this.mvRank = [];
       this.$api.videoData
         .getTopMv({

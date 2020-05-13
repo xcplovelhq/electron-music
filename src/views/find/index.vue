@@ -86,7 +86,7 @@ export default {
     draggable
   },
   display: "Transition",
-  data () {
+  data() {
     return {
       visible: false,
       columnList: [
@@ -117,7 +117,7 @@ export default {
       i: 0
     };
   },
-  created () {
+  created() {
     this.getBanner();
     this.getPersonalized();
     this.getRecommendResource();
@@ -126,7 +126,7 @@ export default {
     this.getPersonalizedDjprogram();
   },
   computed: {
-    dragOptions () {
+    dragOptions() {
       return {
         bannerIdx: 0,
         animation: 200,
@@ -137,13 +137,13 @@ export default {
     }
   },
   methods: {
-    handleDialog () {
+    handleDialog() {
       this.visible = true;
     },
-    handleReset () {
+    handleReset() {
       this.columnList = this.columnList.sort((a, b) => a.id - b.id);
     },
-    handleClick (row, idx) {
+    handleClick(row, idx) {
       if (idx === this.bannerIdx) {
         if (row.targetType === 1) {
           this.$store.dispatch("getSongDetails", { ids: row.targetId });
@@ -158,37 +158,37 @@ export default {
         }
       }
     },
-    getBannerIdx (row) {
+    getBannerIdx(row) {
       this.bannerIdx = row;
     },
-    getBanner () {
+    getBanner() {
       this.$api.findData.getBanner().then(({ data }) => {
         this.bannerList = data.banners;
       });
     },
-    getPersonalized () {
+    getPersonalized() {
       this.$api.findData.getPersonalized().then(({ data }) => {
         this.songSheetList = data.result;
       });
     },
-    getRecommendResource () {
+    getRecommendResource() {
       this.$api.findData.getRecommendResource().then(({ data }) => {
         console.log(data);
 
         // this.songSheetList = data.recommend;
       });
     },
-    getPersonalizedNewsong () {
+    getPersonalizedNewsong() {
       this.$api.findData.getPersonalizedNewsong().then(({ data }) => {
         this.newSongList = data.result;
       });
     },
-    getPersonalizedMv () {
+    getPersonalizedMv() {
       this.$api.findData.getPersonalizedMv().then(({ data }) => {
         this.videoList = data.result;
       });
     },
-    getPersonalizedDjprogram () {
+    getPersonalizedDjprogram() {
       this.$api.findData.getPersonalizedDjprogram().then(({ data }) => {
         this.djList = data.result;
       });

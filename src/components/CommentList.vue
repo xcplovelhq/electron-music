@@ -1,64 +1,76 @@
 <template>
   <div class="g-comment">
-    <template v-for="item in commentList">
-      <div class="m-box" :key="item.title" v-if="item.isShow">
-        <h3>
-          {{ item.title }}{{ item.title === "最新评论" ? `（${total}）` : "" }}
-        </h3>
-        <Loading v-if="isLoading"></Loading>
-        <ul v-else>
-          <li v-for="v in item.list" :key="v.commentId">
-            <div class="m-img">
-              <Avata :ImgUrl="v.user.avatarUrl" Size="35"></Avata>
-            </div>
-            <div class="m-info">
-              <div class="m-comment">
-                <router-link
-                  :to="{ name: 'userDetails', query: { id: v.user.userId } }"
-                  >{{ v.user.nickname }}:</router-link
-                >
-                {{ v.content }}
-              </div>
-              <div
-                class="m-comment m-reply"
-                v-if="v.beReplied && v.beReplied.length > 0"
-              >
-                <router-link
-                  :to="{
-                    name: 'userDetails',
-                    query: { id: v.beReplied[0].user.userId }
-                  }"
-                  >@{{ v.beReplied[0].user.nickname }}:</router-link
-                >
-                {{ v.beReplied[0].content }}
-              </div>
-              <div class="m-tips flex-justify-between">
-                <div class="m-time">
-                  {{ $moment(v.time).format("M月D日 kk:mm") }}
-                </div>
-                <div class="m-otder">
-                  <div class="i-zan">
-                    <i class="iconfont">&#xe611;</i>{{ v.likedCount }}
-                  </div>
-                  <div><i class="iconfont">&#xe60c;</i></div>
-                  <div><i class="iconfont">&#xe620;</i></div>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
+    <Loading v-if="isLoading"></Loading>
+
+    <template v-else>
+      <div class="m-no-common" v-if="commentList[1].list.length <= 0">
+        还没有评论哦，快来抢沙发~
       </div>
+      <template v-else>
+        <template v-for="item in commentList">
+          <div class="m-box" :key="item.title" v-if="item.isShow">
+            <h3>
+              {{ item.title
+              }}{{ item.title === "最新评论" ? `（${total}）` : "" }}
+            </h3>
+            <ul v-if="!isLoading">
+              <li v-for="v in item.list" :key="v.commentId">
+                <div class="m-img">
+                  <Avata :ImgUrl="v.user.avatarUrl" Size="35"></Avata>
+                </div>
+                <div class="m-info">
+                  <div class="m-comment">
+                    <router-link
+                      :to="{
+                        name: 'userDetails',
+                        query: { id: v.user.userId }
+                      }"
+                      >{{ v.user.nickname }}:</router-link
+                    >
+                    {{ v.content }}
+                  </div>
+                  <div
+                    class="m-comment m-reply"
+                    v-if="v.beReplied && v.beReplied.length > 0"
+                  >
+                    <router-link
+                      :to="{
+                        name: 'userDetails',
+                        query: { id: v.beReplied[0].user.userId }
+                      }"
+                      >@{{ v.beReplied[0].user.nickname }}:</router-link
+                    >
+                    {{ v.beReplied[0].content }}
+                  </div>
+                  <div class="m-tips flex-justify-between">
+                    <div class="m-time">
+                      {{ $moment(v.time).format("M月D日 kk:mm") }}
+                    </div>
+                    <div class="m-otder">
+                      <div class="i-zan">
+                        <i class="iconfont">&#xe611;</i>{{ v.likedCount }}
+                      </div>
+                      <div><i class="iconfont">&#xe60c;</i></div>
+                      <div><i class="iconfont">&#xe620;</i></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </template>
+        <div class="m-pagination">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :current-page="params.offset"
+            :page-size="params.limit"
+            :total="total"
+            @current-change="handleChange"
+          ></el-pagination>
+        </div>
+      </template>
     </template>
-    <div class="m-pagination">
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :current-page="params.offset"
-        :page-size="params.limit"
-        :total="total"
-        @current-change="handleChange"
-      ></el-pagination>
-    </div>
   </div>
 </template>
 
@@ -71,8 +83,9 @@ export default {
     Avata,
     Loading
   },
-  data() {
+  data () {
     return {
+      isAllLoading: false,
       isLoading: false,
       total: 0,
       params: {
@@ -94,14 +107,15 @@ export default {
     };
   },
   props: {
-    type: String
+    type: String,
+    random: Number
   },
-  created() {
+  created () {
     this.getData(1);
   },
-  mounted() {},
+  mounted () { },
   methods: {
-    getData(row) {
+    getData (row) {
       switch (this.type) {
         case "songSheet":
           this.getCommentPlaylist(row);
@@ -118,15 +132,18 @@ export default {
         case "mv":
           this.getCommentMv(row);
           break;
+        case "dynamic":
+          this.getCommentEvent(row);
+          break;
         default:
           break;
       }
     },
-    handleChange(row) {
+    handleChange (row) {
       this.params.offset = row;
       this.getData(row);
     },
-    getCommentPlaylist(offset) {
+    getCommentPlaylist (offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -151,7 +168,7 @@ export default {
           this.isLoading = false;
         });
     },
-    getCommentAlbum(offset) {
+    getCommentAlbum (offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -175,7 +192,7 @@ export default {
           this.isLoading = false;
         });
     },
-    getCommentMusic(offset) {
+    getCommentMusic (offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -200,7 +217,7 @@ export default {
           this.isLoading = false;
         });
     },
-    getCommentVideo(offset) {
+    getCommentVideo (offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -225,7 +242,7 @@ export default {
           this.isLoading = false;
         });
     },
-    getCommentMv(offset) {
+    getCommentMv (offset) {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
       this.isLoading = true;
@@ -249,6 +266,33 @@ export default {
           newC.list = data.comments || [];
           this.isLoading = false;
         });
+    },
+    getCommentEvent () {
+      let hotC = this.commentList[0];
+      let newC = this.commentList[1];
+      this.isLoading = true;
+      newC.list = [];
+      hotC.list = [];
+      if (this.params.offset > 1) {
+        hotC.isShow = false;
+      } else {
+        hotC.isShow = true;
+      }
+      this.$api.userData
+        .getCommentEvent({
+          threadId: this.$route.query.id
+        })
+        .then(({ data }) => {
+          this.total = data.total;
+          hotC.list = data.hotComments || [];
+          newC.list = data.comments || [];
+          this.isLoading = false;
+        });
+    }
+  },
+  watch: {
+    random () {
+      this.getData(1);
     }
   }
 };
@@ -262,6 +306,11 @@ export default {
   }
   .m-box {
     margin-bottom: 40px;
+  }
+  .m-no-common {
+    padding-top: 50px;
+    text-align: center;
+    font-size: 12px;
   }
   ul {
     li {

@@ -50,8 +50,12 @@
               来源：<router-link to="">{{ getPlayDetails.name }}</router-link>
             </div>
           </div>
-          <div class="m-lyric" ref="lyric">
-            <ul>
+          <div
+            class="m-lyric"
+            ref="lyric"
+            :class="{ 'm-no': getLyric.length === 0 }"
+          >
+            <ul v-if="getLyric && getLyric.length > 0">
               <template v-for="(item, idx) in getLyric">
                 <li
                   :key="item.key"
@@ -64,6 +68,9 @@
                 </li>
               </template>
             </ul>
+            <div v-else>
+              纯音乐，请你欣赏
+            </div>
           </div>
           <!-- {{ getLyricTime }} -->
         </div>
@@ -135,7 +142,7 @@ export default {
     // Loading,
     mImage
   },
-  data() {
+  data () {
     return {
       isLoading: false,
       // pattern: /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]/g,
@@ -167,17 +174,17 @@ export default {
     };
   },
   computed: {
-    getPlayInfo() {
+    getPlayInfo () {
       return this.$store.state.Play.playInfo;
     },
-    getPlayDetails() {
+    getPlayDetails () {
       return this.$store.state.Play.playDetails;
     },
-    playing() {
+    playing () {
       return this.$store.state.Play.isPlay;
     },
 
-    getLyric() {
+    getLyric () {
       let newLyric = [];
       let playLyric = this.$store.state.Play.playLyric;
       let lyric = playLyric.lrc.lyric;
@@ -205,22 +212,22 @@ export default {
       }
       return newLyric;
     },
-    getLyricTime() {
+    getLyricTime () {
       const lyric = this.$store.state.Play.playLyric.lrc.lyric;
       const arr = lyric.match(this.pattern);
       return arr;
     }
   },
-  created() {
+  created () {
     this.getSimiPlaylist();
     this.getSimiSong();
     this.getSimiUser();
   },
   methods: {
-    handleBack() {
+    handleBack () {
       this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", false);
     },
-    setTime(data) {
+    setTime (data) {
       let time = data.slice(1, -1);
       if (time.indexOf(":") >= 0) {
         time = time.replace(":", "").replace(".", "");
@@ -228,14 +235,14 @@ export default {
 
       return time;
     },
-    getPlayCount(row) {
+    getPlayCount (row) {
       return getSum(row.playCount);
     },
 
-    getSingerName(row, idx) {
+    getSingerName (row, idx) {
       return getSingerName(row, idx);
     },
-    getCurrentTime() {
+    getCurrentTime () {
       let currentTime = (this.$store.state.Play.currentTime * 1000).toFixed(0);
 
       // if (currentTime > 0) {
@@ -254,7 +261,7 @@ export default {
       return this.$moment(+currentTime).format("mmssSSS");
     },
 
-    getActiveLyric(row, idx) {
+    getActiveLyric (row, idx) {
       if (row.time < this.getCurrentTime() && this.lyricIdx <= idx) {
         this.lyricIdx = idx;
         return true;
@@ -262,7 +269,7 @@ export default {
         return false;
       }
     },
-    getSimiPlaylist() {
+    getSimiPlaylist () {
       this.$api.songData
         .getSimiPlaylist({
           id: this.getPlayInfo.id
@@ -271,7 +278,7 @@ export default {
           this.rightList[0].list = data.playlists;
         });
     },
-    getSimiSong() {
+    getSimiSong () {
       this.$api.musicData
         .getSimiSong({
           id: this.getPlayInfo.id
@@ -280,7 +287,7 @@ export default {
           this.rightList[1].list = data.songs;
         });
     },
-    getSimiUser() {
+    getSimiUser () {
       this.$api.userData
         .getSimiUser({
           id: this.getPlayInfo.id
@@ -383,6 +390,11 @@ export default {
       border-right: 2px solid #f4f4f5;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      &.m-no {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
       ul {
         width: 100%;
       }

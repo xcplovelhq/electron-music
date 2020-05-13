@@ -16,7 +16,7 @@ export default {
     },
     to: {
       type: Object,
-      default () {
+      default() {
         return {};
       }
     }

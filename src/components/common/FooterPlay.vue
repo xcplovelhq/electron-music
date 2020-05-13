@@ -78,7 +78,7 @@
         <i class="iconfont" v-else @click="handleLike(false)">&#xeca1;</i>
       </div>
       <div class="m-prev" @click="handleClick('PREV')">
-        <i class="iconfont">&#xe727;</i>
+        <i class="iconfont" :class="{ 'z-fm': getFm }">&#xe727;</i>
       </div>
       <div class="m-play" @click="handleClick('PLAY')">
         <i class="iconfont" v-if="!playing">&#xe648;</i>
@@ -90,7 +90,7 @@
       <div class="m-share"><i class="iconfont">&#xe60c;</i></div>
     </div>
     <div class="m-play-order">
-      <div class="m-loop" @click="handleLook">
+      <div class="m-loop" @click="handleLook" v-if="!getFm">
         <el-tooltip
           class="item"
           effect="dark"
@@ -100,7 +100,7 @@
           <i title="1" class="iconfont" v-html="loopList[loopId].icon"></i>
         </el-tooltip>
       </div>
-      <div class="m-list" @click="openList">
+      <div class="m-list" @click="openList" v-if="!getFm">
         <i class="iconfont" :class="{ active: $store.state.isShowDrawer }"
           >&#xe634;</i
         >
@@ -144,7 +144,7 @@ export default {
   components: {
     MyImage
   },
-  data() {
+  data () {
     return {
       time: "",
       volume: 0,
@@ -180,7 +180,7 @@ export default {
       ]
     };
   },
-  created() {
+  created () {
     ipcRenderer.on("control", (event, data) => {
       switch (data) {
         case "play":
@@ -199,7 +199,7 @@ export default {
     });
     this.getSongUrlData();
   },
-  mounted() {
+  mounted () {
     // let self = this;
     this.audio = this.$refs.audio;
     this.volume = this.$store.state.Play.volume;
@@ -219,14 +219,14 @@ export default {
   computed: {
     ...mapActions(["getSongUrl"]),
 
-    getCurrentTime() {
+    getCurrentTime () {
       return moment(this.currentTime * 1000).format("mm:ss");
     },
-    getPlayInfo() {
+    getPlayInfo () {
       return this.$store.state.Play.playInfo;
     },
 
-    getMusicUrl() {
+    getMusicUrl () {
       let url = "";
       let playUrls = this.$store.state.Play.playUrls;
       playUrls.forEach(item => {
@@ -236,41 +236,47 @@ export default {
       });
       return url;
     },
-    playing() {
+    playing () {
       if (this.$store.state.Play.isPlay) {
         this.audio && this.audio.play();
       } else {
         this.audio && this.audio.pause();
       }
       return this.$store.state.Play.isPlay;
+    },
+
+    getFm () {
+      return this.$store.state.Play.isFM;
     }
   },
   methods: {
-    openPlaying() {
-      this.$store.commit(
-        "CHANGE_PLAYING_DRAWER_STATUS",
-        !this.$store.state.isShowPlayingDrawer
-      );
+    openPlaying () {
+      if (!this.getFm) {
+        this.$store.commit(
+          "CHANGE_PLAYING_DRAWER_STATUS",
+          !this.$store.state.isShowPlayingDrawer
+        );
+      }
     },
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    handleLike() {},
-    getIsLike() {
+    handleLike () { },
+    getIsLike () {
       return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
     },
-    openList() {
+    openList () {
       this.$store.commit("SET_DRAWER_TYPE", "playList");
       this.$store.commit(
         "CHANGE_DRAWER_STATUS",
         !this.$store.state.isShowDrawer
       );
     },
-    handleLook() {
+    handleLook () {
       this.loopId++;
       if (this.loopId > 3) {
         this.loopId = 0;
@@ -278,28 +284,28 @@ export default {
       this.loopValue = this.loopList[this.loopId].index;
       this.$store.commit("SET_LOOP", this.loopValue);
     },
-    handleVolume() {
+    handleVolume () {
       this.audio.volume = this.volume;
       this.$store.commit("SET_VOLUME", this.volume);
     },
-    getDuration(e) {
+    getDuration (e) {
       this.duration = Math.floor(e.target.duration);
       this.time = moment(e.target.duration * 1000).format("mm:ss");
     },
-    getTimeupdate(e) {
+    getTimeupdate (e) {
       this.currentTime = Math.floor(e.target.currentTime);
       this.$store.commit("SET_CURRENT_TIME", e.target.currentTime);
     },
-    getEnded() {
+    getEnded () {
       this.getPLayList("NEXT", "END");
     },
-    handleChange() {
+    handleChange () {
       this.audio.currentTime = this.currentTime;
     },
-    handleInput() {
+    handleInput () {
       // this.currentTime = row;
     },
-    getPLayList(type, status) {
+    getPLayList (type, status) {
       let tracks = this.$store.state.Play.playList;
       let row = this.$store.state.Play.playInfo;
       let nextRow = {};
@@ -342,7 +348,7 @@ export default {
         }
       });
     },
-    handleClick(type) {
+    handleClick (type) {
       switch (type) {
         case "PLAY":
           if (!this.$store.state.Play.isPlay) {
@@ -353,16 +359,18 @@ export default {
           break;
         case "NEXT":
           this.getPLayList("NEXT");
+          this.$store.commit("SET_ISNEXT", !this.$store.state.Play.isNext);
           break;
         case "PREV":
-          this.getPLayList("PREV");
-
+          if (!this.getFm) {
+            this.getPLayList("PREV");
+          }
           break;
         default:
           break;
       }
     },
-    getSongUrlData() {
+    getSongUrlData () {
       if (this.$store.state.Play.playDetails) {
         this.$store.dispatch("getSongUrl", {
           id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
@@ -540,6 +548,9 @@ export default {
     }
     .m-prev {
       margin-left: 37px;
+      .z-fm {
+        color: #f5c5c3;
+      }
     }
     .m-next {
       margin-right: 37px;

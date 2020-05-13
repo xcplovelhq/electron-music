@@ -7,9 +7,9 @@
       </div>
       <Loading v-if="isLoading"></Loading>
       <ul v-else>
-        <template v-for="i in list">
+        <template v-for="(i, idx) in list">
           <li
-            :key="i.id"
+            :key="idx"
             @dblclick="handledbClick(i)"
             @click="handleClick(i)"
             :class="{ active: id == i.id }"
@@ -51,21 +51,21 @@ export default {
   components: {
     Loading
   },
-  data() {
+  data () {
     return {
       isLoading: false,
       id: 0
     };
   },
   computed: {
-    list() {
+    list () {
       console.log(this.$store.state.Play.playList);
 
       return this.$store.state.Play.playList;
     }
   },
   methods: {
-    getPlayStatus(row) {
+    getPlayStatus (row) {
       if (
         this.$store.state.Play.playInfo &&
         row.id === this.$store.state.Play.playInfo.id
@@ -75,20 +75,20 @@ export default {
         return false;
       }
     },
-    handleFind() {
+    handleFind () {
       this.$store.commit("CHANGE_DRAWER_STATUS", false);
       this.$router.push({
         name: "find"
       });
     },
-    handleClick(row) {
+    handleClick (row) {
       this.id = row.id;
     },
-    handledbClick(row) {
+    handledbClick (row) {
       this.$store.commit("SET_PLAY_INFO", row);
       this.$store.commit("SET_ISPLAY", true);
     },
-    handleLike(status, row) {
+    handleLike (status, row) {
       this.$api.musicData
         .setLikeMusic({
           id: row.id,
@@ -103,14 +103,14 @@ export default {
           // });
         });
     },
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    getTime(row) {
+    getTime (row) {
       return Moment(row.dt).format("mm:ss");
     }
   }

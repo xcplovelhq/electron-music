@@ -37,14 +37,14 @@
                 }"
                 >{{ i.name }}</span
               >
-              <span class="m-text" v-if="i.alia && i.alia.length > 0"
-                >（{{ i.alia[0] }}）</span
-              >
+              <!-- <span class="m-text" v-if="i.alia && i.alia.length > 0"
+                >（{{ i.alia && i.alia[0] }}）</span
+              > -->
             </div>
             <div class="m-name" v-if="isShowSinger">
               <router-link
                 v-for="(v, idx) in i.ar || i.artists"
-                :key="v.id"
+                :key="idx"
                 :to="{
                   name: 'singerDetails',
                   query: { id: v.id }
@@ -89,13 +89,13 @@ export default {
     },
     list: {
       type: Array,
-      default() {
+      default () {
         return [];
       }
     },
     type: {
       type: String,
-      default() {
+      default () {
         return "";
       }
     },
@@ -108,36 +108,36 @@ export default {
       default: true
     }
   },
-  data() {
+  data () {
     return {
       id: 0,
       info: {}
     };
   },
-  created() {
+  created () {
     console.log(this.$route.query.text);
   },
   watch: {
-    list() {
+    list () {
       this.info.id = -1;
       this.info.tracks = this.list;
     },
-    details() {
+    details () {
       this.info = this.details;
     }
   },
   methods: {
     ...mapActions(["getUserLikelist", "getSongUrl"]),
-    getIsLike(row) {
+    getIsLike (row) {
       return (
         this.$store.state.User.likeMusicIds &&
         this.$store.state.User.likeMusicIds.includes(row.id)
       );
     },
-    handleClick(row) {
+    handleClick (row) {
       this.id = row.id;
     },
-    getDescribe(v) {
+    getDescribe (v) {
       let text = v.substring(v.indexOf(this.$route.query.text));
       let reg = /[\r\n]/g;
       let rep = new RegExp(this.$route.query.text, "g");
@@ -148,7 +148,7 @@ export default {
       text = text.replace(rep, resDtring);
       return text && text.replace(reg, "<br />");
     },
-    handledbClick(row) {
+    handledbClick (row) {
       let list = [];
       if (row.fee == 0 && row.st < 0) {
         this.$toasted.show("因合作方要求，该资源暂时下架");
@@ -158,6 +158,7 @@ export default {
         this.$toasted.show("版权方要求，当前歌曲仅限开通VIP使用");
         return;
       }
+      this.$store.commit("SET_FM", false);
       this.$store.commit("SET_PLAY_INFO", row);
       // 同歌单下不重新获取url，但是网易云的歌曲url有时间限制，故取消
       // if (
@@ -188,7 +189,7 @@ export default {
         this.$store.dispatch("getSongDetails", { ids: row.id });
       }
     },
-    handleLike(status, row) {
+    handleLike (status, row) {
       this.$api.musicData
         .setLikeMusic({
           id: row.id,
@@ -203,7 +204,7 @@ export default {
           console.log(data);
         });
     },
-    getPlayStatus(row) {
+    getPlayStatus (row) {
       if (
         this.$store.state.Play.playInfo &&
         row.id === this.$store.state.Play.playInfo.id
@@ -213,24 +214,24 @@ export default {
         return false;
       }
     },
-    getSongStatus(row) {
+    getSongStatus (row) {
       console.log(row);
     },
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    getSum(idx) {
+    getSum (idx) {
       if (idx < 10) {
         return "0" + idx;
       } else {
         return idx;
       }
     },
-    getTime(row) {
+    getTime (row) {
       return Moment(row.dt).format("mm:ss");
     }
   }

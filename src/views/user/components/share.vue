@@ -64,14 +64,14 @@ export default {
     row: Object
   },
   methods: {
-    getSongName (item, idx) {
+    getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    getShareImg (row) {
+    getShareImg(row) {
       if (row.song) {
         return row.song.album && row.song.album.picUrl;
       } else if (row.resource) {
@@ -80,7 +80,7 @@ export default {
         return row.playlist.coverImgUrl;
       }
     },
-    handleClick () {
+    handleClick() {
       if (this.row.isShowPic) {
         return;
       }

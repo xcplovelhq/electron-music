@@ -37,10 +37,10 @@ export default {
   },
 
   methods: {
-    hanldeEnlarge (item, row, idx) {
+    hanldeEnlarge(item, row, idx) {
       this.$emit("hanldeEnlarge", item, row, idx);
     },
-    getWidth (item) {
+    getWidth(item) {
       if (this.row.pics.length > 1) {
         return "120px";
       } else {
@@ -51,7 +51,7 @@ export default {
         }
       }
     },
-    getHeight (item) {
+    getHeight(item) {
       if (this.row.pics.length > 1) {
         return "auto";
       } else {
@@ -62,7 +62,7 @@ export default {
         }
       }
     },
-    getPosition (v) {
+    getPosition(v) {
       if (this.row.pics.length > 1) {
         return false;
       } else {

@@ -9,6 +9,16 @@ const loginCellphone = async function (data) {
   return res;
 };
 
+// 获取私人FM
+const getPersonalFm = async function (data) {
+  const res = await axios.get({
+    // url: "/personal_fm?timestamp=" + new Date().getTime(),
+    url: "/personal_fm",
+    data
+  });
+  return res;
+};
+
 // 刷新登录状态
 const loginRefresh = async function (data) {
   const res = await axios.get({
@@ -147,6 +157,14 @@ const getEvent = async function (data) {
   });
   return res;
 };
+// 获取动态评论
+const getCommentEvent = async function (data) {
+  const res = await axios.get({
+    url: "/comment/event",
+    data
+  });
+  return res;
+};
 // 获取热门话题
 const getHotTopic = async function (data) {
   const res = await axios.get({
@@ -157,6 +175,7 @@ const getHotTopic = async function (data) {
 };
 export default {
   getUserDetail,
+  getPersonalFm,
   loginRefresh,
   loginCellphone,
   getUserPlaylist,
@@ -174,5 +193,6 @@ export default {
   getUserFolloweds,
   getUserEvent,
   getEvent,
+  getCommentEvent,
   getHotTopic
 };

@@ -109,7 +109,7 @@ export default {
     SongSheet,
     Loading
   },
-  data () {
+  data() {
     return {
       params: {
         limit: 10,
@@ -152,7 +152,7 @@ export default {
       songSheetList: []
     };
   },
-  created () {
+  created() {
     if (this.$route.query.tag) {
       this.params.cat = this.$route.query.tag;
     }
@@ -162,18 +162,18 @@ export default {
     this.getPlaylistCatlist();
   },
   methods: {
-    handleClick (row) {
+    handleClick(row) {
       this.params.cat = row.name;
       this.popover = false;
       this.getTopPlaylist();
       this.getPlaylistHighquality();
     },
-    getPlaylistHot () {
+    getPlaylistHot() {
       this.$api.songData.getPlaylistHot().then(({ data }) => {
         this.classifyList = data.tags;
       });
     },
-    getPlaylistHighquality () {
+    getPlaylistHighquality() {
       this.$api.songData
         .getPlaylistHighquality({
           ...this.params
@@ -183,7 +183,7 @@ export default {
           // this.classifyList = data.tags;
         });
     },
-    getTopPlaylist () {
+    getTopPlaylist() {
       this.songSheetList = [];
       this.$api.songData
         .getTopPlaylist({
@@ -194,7 +194,7 @@ export default {
           // this.classifyList = data.tags;
         });
     },
-    getPlaylistCatlist () {
+    getPlaylistCatlist() {
       this.$api.songData.getPlaylistCatlist().then(({ data }) => {
         data.sub.forEach(item => {
           this.songGroupList[item.category].list.push(item);

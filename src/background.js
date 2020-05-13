@@ -7,6 +7,7 @@ import {
 } from "vue-cli-plugin-electron-builder/lib";
 import "./store";
 const isDevelopment = process.env.NODE_ENV !== "production";
+const path = require("path");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,10 +27,14 @@ function createWindow() {
     minHeight: 650,
     height: 650,
     titleBarStyle: "hiddenInset",
+    icon: path.join(__dirname, "bundled/img/logo.png"),
     webPreferences: {
       nodeIntegration: true
     }
   });
+  if (process.platform === "darwin") {
+    app.dock.setIcon(path.join(__dirname, "bundled/img/logo.png"));
+  }
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -69,16 +74,13 @@ function openWin() {
   });
 }
 ipcMain.on("openWin", () => openWin());
-ipcMain.on("login", (e, data) => {
-  console.log(e, data);
+ipcMain.on("login", () => {
   loginWin.close();
 });
-ipcMain.on("closeWin", (e, data) => {
-  console.log(e, data);
+ipcMain.on("closeWin", () => {
   loginWin.close();
 });
 ipcMain.on("setUserInfo", (e, data) => {
-  console.log(e, data);
   win.webContents.send("setUserInfoData", data);
 });
 ipcMain.on("openUrl", (e, data) => {

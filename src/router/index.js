@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Find from "../views/find";
+import Fm from "../views/fm";
 import RankingList from "../views/find/ranking-list";
 import SongSheet from "@/views/song/";
 import SongSheetDetails from "@/views/song/song-sheet-details";
@@ -20,6 +21,8 @@ import MvAll from "@/views/video/mv-all";
 import Search from "@/views/search";
 import UserFollowFans from "@/views/user/user-follow-fans";
 import UserDynamic from "@/views/user/user-dynamic";
+import DynamicDetails from "@/views/user/dynamic-details";
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -32,6 +35,11 @@ const routes = [
         path: "find",
         name: "find",
         component: Find
+      },
+      {
+        path: "fm",
+        name: "fm",
+        component: Fm
       },
       {
         path: "ranking-list",
@@ -112,6 +120,11 @@ const routes = [
         path: "userDynamic",
         name: "userDynamic",
         component: UserDynamic
+      },
+      {
+        path: "dynamicDetails",
+        name: "dynamicDetails",
+        component: DynamicDetails
       }
     ]
   },

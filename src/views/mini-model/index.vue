@@ -203,11 +203,6 @@ export default {
       ipcRenderer.send("control", { type: "volume", data: volume });
     },
     handleClick(type) {
-      if (type === "play") {
-        this.$store.commit("SET_ISPLAY", !this.$store.state.Play.isPlay);
-      } else {
-        this.$store.commit("GET_PLAY_INFO");
-      }
       ipcRenderer.send("control", { type: type });
     },
     openPlaying() {}

@@ -258,10 +258,10 @@ export default {
   methods: {
     openPlaying() {
       if (!this.getFm) {
-        this.$store.commit(
-          "CHANGE_PLAYING_DRAWER_STATUS",
-          !this.$store.state.isShowPlayingDrawer
-        );
+        this.$store.dispatch("setData", {
+          stateKey: "isShowPlayingDrawer",
+          data: !this.$store.state.isShowPlayingDrawer
+        });
       }
     },
     getSongName(item, idx) {
@@ -276,11 +276,14 @@ export default {
       return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
     },
     openList() {
-      this.$store.commit("SET_DRAWER_TYPE", "playList");
-      this.$store.commit(
-        "CHANGE_DRAWER_STATUS",
-        !this.$store.state.isShowDrawer
-      );
+      this.$store.dispatch("setData", {
+        stateKey: "drawerType",
+        data: "playList"
+      });
+      this.$store.dispatch("setData", {
+        stateKey: "isShowDrawer",
+        data: !this.$store.state.isShowDrawer
+      });
     },
     handleLook() {
       this.loopId++;
@@ -288,12 +291,18 @@ export default {
         this.loopId = 0;
       }
       this.loopValue = this.loopList[this.loopId].index;
-      this.$store.commit("SET_LOOP", this.loopValue);
+      this.$store.dispatch("Play/setData", {
+        stateKey: "loop",
+        data: this.loopValue
+      });
     },
     handleVolume(volume) {
       this.volume = volume;
       this.audio.volume = this.volume;
-      this.$store.commit("SET_VOLUME", this.volume);
+      this.$store.dispatch("Play/setData", {
+        stateKey: "volume",
+        data: this.volume
+      });
       ipcRenderer.send("setMiniInfo", { type: "volume", data: this.volume });
     },
     getDuration(e) {
@@ -306,7 +315,10 @@ export default {
     },
     getTimeupdate(e) {
       this.currentTime = Math.floor(e.target.currentTime);
-      this.$store.commit("SET_CURRENT_TIME", e.target.currentTime);
+      this.$store.dispatch("Play/setData", {
+        stateKey: "currentTime",
+        data: e.target.currentTime
+      });
       ipcRenderer.send("setMiniInfo", {
         type: "currentTime",
         data: this.currentTime
@@ -333,11 +345,20 @@ export default {
         if (this.loopValue === "single") {
           this.audio.currentTime = 0;
           this.audio.load();
-          this.$store.commit("SET_ISPLAY", true);
+          this.$store.dispatch("Play/setData", {
+            stateKey: "isPlay",
+            data: true
+          });
         } else if (this.loopValue === "order") {
           if (row.id === tracks[tracks.length - 1].id) {
-            this.$store.commit("SET_ISPLAY", false);
-            this.$store.commit("SET_PLAY_INFO", {});
+            this.$store.dispatch("Play/setData", {
+              stateKey: "isPlay",
+              data: false
+            });
+            this.$store.dispatch("Play/setData", {
+              stateKey: "playInfo",
+              data: {}
+            });
           }
         }
         return;
@@ -358,20 +379,32 @@ export default {
               nextRow = tracks[i - 1];
             }
           }
-          this.$store.commit("SET_PLAY_INFO", nextRow);
-          this.$store.dispatch("getLyric", { id: nextRow.id });
-          this.$store.commit("SET_ISPLAY", true);
+          this.$store.dispatch("Play/setData", {
+            stateKey: "playInfo",
+            data: nextRow
+          });
+          this.$store.dispatch("Play/getLyric", { id: nextRow.id });
+          this.$store.dispatch("Play/setData", {
+            stateKey: "isPlay",
+            data: true
+          });
         }
       });
     },
     handleClick(type) {
       switch (type) {
         case "PLAY":
-          this.$store.commit("SET_ISPLAY", !this.$store.state.Play.isPlay);
+          this.$store.dispatch("Play/setData", {
+            stateKey: "isPlay",
+            data: !this.$store.state.Play.isPlay
+          });
           break;
         case "NEXT":
           this.getPLayList("NEXT");
-          this.$store.commit("SET_ISNEXT", !this.$store.state.Play.isNext);
+          this.$store.dispatch("Play/setData", {
+            stateKey: "isNext",
+            data: !this.$store.state.Play.isNext
+          });
           break;
         case "PREV":
           if (!this.getFm) {
@@ -384,7 +417,7 @@ export default {
     },
     getSongUrlData() {
       if (this.$store.state.Play.playDetails) {
-        this.$store.dispatch("getSongUrl", {
+        this.$store.dispatch("Play/getSongUrl", {
           id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
         });
       }
@@ -404,7 +437,7 @@ export default {
   padding: 0 30px 0 10px;
   border-top: 2px solid #f5f5f5;
   background: #fff;
-  z-index: 1000;
+  z-index: 10000;
   .m-slider {
     position: absolute;
     left: 0;

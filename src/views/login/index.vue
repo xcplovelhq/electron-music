@@ -9,12 +9,17 @@
         <img src="@/assets/login-logo.png" />
       </div>
       <div class="m-input">
-        <el-input v-model="phone" placeholder="请输入手机号">
+        <el-input v-model="phone" placeholder="请输入手机号" type="number">
           <i class="iconfont" slot="prefix">&#xe63a;</i>
         </el-input>
       </div>
       <div class="m-input" style="margin-top:10px;">
-        <el-input v-model="password" show-password placeholder="请输入密码">
+        <el-input
+          v-model="password"
+          show-password
+          placeholder="请输入密码"
+          type="text"
+        >
           <i class="iconfont" slot="prefix">&#xe630;</i>
         </el-input>
       </div>
@@ -25,8 +30,6 @@
 
 <script>
 import { ipcRenderer } from "electron";
-import { mapActions } from "vuex";
-import { storage } from "@/lib/store";
 export default {
   data() {
     return {
@@ -35,23 +38,24 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["loginCellphone"]),
     hanldeClose() {
       ipcRenderer.send("closeWin");
     },
     handleLogin() {
       // ipcRenderer.send("setUserInfo");
       // ipcRenderer.send("closeWin");
-      this.loginCellphone({
-        phone: this.phone,
-        password: this.password
-      }).then(data => {
-        if (data.code === 200) {
-          storage("userInfo", data.profile);
-          ipcRenderer.send("setUserInfo");
-          ipcRenderer.send("closeWin");
-        }
-      });
+      if (!this.phone) {
+        return this.$toasted.show("请输入手机号");
+      }
+      if (!this.password) {
+        return this.$toasted.show("请输入密码");
+      }
+      if (this.phone && this.password) {
+        this.$store.dispatch("User/loginCellphone", {
+          phone: this.phone,
+          password: this.password
+        });
+      }
     }
   }
 };

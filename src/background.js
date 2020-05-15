@@ -23,7 +23,7 @@ winURL =
   process.env.NODE_ENV === "development"
     ? `${process.env.WEBPACK_DEV_SERVER_URL}`
     : `file://${__dirname}/index.html`;
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1200,
@@ -55,7 +55,7 @@ function createWindow () {
     win = null;
   });
 }
-function openWin () {
+function openWin() {
   loginWin = new BrowserWindow({
     // resizable: false,
     width: 350,
@@ -75,7 +75,7 @@ function openWin () {
     loginWin = null;
   });
 }
-function openMiniModel () {
+function openMiniModel() {
   miniModel = new BrowserWindow({
     // width: 333,
     // height: 333,

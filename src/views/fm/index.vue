@@ -238,7 +238,7 @@ export default {
     getData() {
       this.$store.commit("SET_FM_INFO", this.list[this.playIdx]);
       this.$store
-        .dispatch("getLyric", {
+        .dispatch("Play/getLyric", {
           id: this.list[this.playIdx].id,
           type: "FM"
         })

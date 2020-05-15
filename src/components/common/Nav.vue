@@ -1,7 +1,7 @@
 <template>
   <div class="g-nav">
     <div class="g-avata" @click="handleLogin">
-      <div class="m-avata" @click="handleDetails">
+      <div class="m-avata" @click.stop="handleDetails">
         <img :src="user.avatarUrl" />
       </div>
       <div class="m-name">
@@ -93,12 +93,11 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 import { ipcRenderer } from "electron";
 import { getStorage } from "@/lib/store";
-import { mapActions } from "vuex";
 export default {
-  data() {
+  data () {
     return {
       isShowFound: true,
       isShowCollapse: true,
@@ -156,20 +155,17 @@ export default {
       ]
     };
   },
-  created() {
+  created () {
+    console.log(this.$store.state);
+    this.$store.dispatch("User/getUserPlaylist").then(() => {
+      console.log("321321");
+    });
+    // this.getUserLikelist();
     ipcRenderer.on("setUserInfoData", () => {
       if (getStorage("userInfo")) {
-        this.$store.commit("SET_USER_INFO", getStorage("userInfo"));
-        this.getUserLikelist({
-          uid: this.$store.state.User.userInfo.userId
-        }).then(data => {
-          this.$store.commit("GET_USER_LIKE_LIST", data.ids);
-        });
-        this.getUserPlaylist({
-          uid: this.$store.state.User.userInfo.userId
-        }).then(data => {
-          this.$store.commit("GET_USER_SONG_SHEET", data.playlist);
-        });
+        // this.$store.commit("SET_USER_INFO", getStorage("userInfo"));
+        this.getUserPlaylist();
+        this.getUserLikelist();
         this.$toasted.show("登录成功");
       }
     });
@@ -185,9 +181,9 @@ export default {
     })
   },
   methods: {
-    ...mapActions(["loginCellphone", "getUserPlaylist", "getUserLikelist"]),
-    handleLogin() {
-      if (getStorage("userInfo")) {
+    ...mapActions(["getUserPlaylist", "getUserLikelist"]),
+    handleLogin () {
+      if (this.user && this.user.userId) {
         console.log("321");
       } else {
         ipcRenderer.send("openWin");
@@ -195,7 +191,7 @@ export default {
 
       // console.log(getStorage("userInfo"), 1111111111111);
     },
-    handleDetails() {
+    handleDetails () {
       this.$router.push({
         name: "userDetails",
         query: { id: this.user.userId }

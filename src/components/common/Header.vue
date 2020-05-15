@@ -110,18 +110,19 @@ export default {
       }
     },
     handleMessage() {
-      this.$store.commit("SET_DRAWER_TYPE", "message");
-      this.$store.commit(
-        "CHANGE_DRAWER_STATUS",
-        !this.$store.state.isShowDrawer
-      );
+      this.$store.dispatch("setData", {
+        stateKey: "drawerType",
+        data: "message"
+      });
+      this.$store.dispatch("setData", {
+        stateKey: "isShowDrawer",
+        data: !this.$store.state.isShowDrawer
+      });
     },
     getMsgProvate() {
-      this.$store.dispatch("getMsgProvate");
+      this.$store.dispatch("User/getMsgProvate");
     },
     openMini() {
-      console.log("1321");
-
       ipcRenderer.send("changeMini");
     }
   }

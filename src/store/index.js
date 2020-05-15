@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import User from "./modules/User";
 import Play from "./modules/Play";
-
+import { createPersistedState, createSharedMutations } from "vuex-electron";
 Vue.use(Vuex);
 const state = {
   isShowDrawer: false,
@@ -11,16 +11,24 @@ const state = {
   mvArea: ["内地", "港台", "欧美", "日本", "韩国"]
 };
 const mutations = {
-  CHANGE_DRAWER_STATUS (state, data) {
+  CHANGE_DRAWER_STATUS(state, data) {
     console.log(data);
 
     state.isShowDrawer = data;
   },
-  CHANGE_PLAYING_DRAWER_STATUS (state, data) {
+  CHANGE_PLAYING_DRAWER_STATUS(state, data) {
     state.isShowPlayingDrawer = data;
   },
-  SET_DRAWER_TYPE (state, data) {
+  SET_DRAWER_TYPE(state, data) {
     state.drawerType = data;
+  },
+  SET_DATA(state, data) {
+    state[data.stateKey] = data.data;
+  }
+};
+const actions = {
+  setData({ commit }, data) {
+    commit("SET_DATA", data);
   }
 };
 export default new Vuex.Store({
@@ -30,4 +38,6 @@ export default new Vuex.Store({
   },
   state,
   mutations,
+  actions,
+  plugins: [createPersistedState(), createSharedMutations()]
 });

@@ -56,7 +56,7 @@ export default {
   props: {
     list: {
       type: Array,
-      default () {
+      default() {
         return [];
       }
     },
@@ -66,14 +66,14 @@ export default {
     }
   },
   methods: {
-    getSum (idx) {
+    getSum(idx) {
       if (idx < 10) {
         return "0" + idx;
       } else {
         return idx;
       }
     },
-    getPlayStatus (row) {
+    getPlayStatus(row) {
       if (
         this.$store.state.Play.playInfo &&
         row.id === this.$store.state.Play.playInfo.id
@@ -83,13 +83,13 @@ export default {
         return false;
       }
     },
-    handleClick (row) {
-      this.$store.dispatch("getSongDetails", { ids: row.id });
+    handleClick(row) {
+      this.$store.dispatch("Play/getSongDetails", { ids: row.id });
     },
-    getSongNameTitle (row) {
+    getSongNameTitle(row) {
       return row.map(item => item.name).join(" / ");
     },
-    getSongName (item, idx) {
+    getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {

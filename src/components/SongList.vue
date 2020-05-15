@@ -182,11 +182,11 @@ export default {
           id: this.info.tracks.map(item => item.id)
         });
         this.$store.commit("SET_PLAY_LIST", list);
-        this.$store.dispatch("getLyric", { id: row.id });
+        this.$store.dispatch("Play/getLyric", { id: row.id });
         this.$store.commit("SET_PLAY_DETAILS", this.info);
         this.$store.commit("SET_ISPLAY", true);
       } else {
-        this.$store.dispatch("getSongDetails", { ids: row.id });
+        this.$store.dispatch("Play/getSongDetails", { ids: row.id });
       }
     },
     handleLike (status, row) {

@@ -146,7 +146,7 @@ export default {
     handleClick(row, idx) {
       if (idx === this.bannerIdx) {
         if (row.targetType === 1) {
-          this.$store.dispatch("getSongDetails", { ids: row.targetId });
+          this.$store.dispatch("Play/getSongDetails", { ids: row.targetId });
         } else if (row.targetType === 10) {
           this.$router.push({
             name: "songSheetDetails",

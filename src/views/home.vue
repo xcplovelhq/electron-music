@@ -133,19 +133,20 @@ export default {
   methods: {
     handleOpen(type) {
       if (type === "playing") {
-        this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", true);
+        // this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", true);
       } else {
-        this.$store.commit("CHANGE_DRAWER_STATUS", true);
+        // this.$store.commit("CHANGE_DRAWER_STATUS", true);
       }
     },
     handleClose(type) {
       if (type === "playing") {
-        this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", false);
+        // this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", false);
       } else {
-        this.$store.commit("CHANGE_DRAWER_STATUS", false);
+        // this.$store.commit("CHANGE_DRAWER_STATUS", false);
       }
     },
     getData() {
+      // this.$store.commit("SET_ISPLAY", false);
       this.$api.userData.loginRefresh().then(() => {});
     }
   }

@@ -22,7 +22,7 @@ import Search from "@/views/search";
 import UserFollowFans from "@/views/user/user-follow-fans";
 import UserDynamic from "@/views/user/user-dynamic";
 import DynamicDetails from "@/views/user/dynamic-details";
-
+import MiniModel from "@/views/mini-model/";
 Vue.use(VueRouter);
 
 const routes = [
@@ -137,6 +137,11 @@ const routes = [
     path: "/mvDetails",
     name: "mvDetails",
     component: MvDetails
+  },
+  {
+    path: "/miniModel",
+    name: "miniModel",
+    component: MiniModel
   }
 ];
 

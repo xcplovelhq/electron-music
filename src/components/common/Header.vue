@@ -31,7 +31,9 @@
             </div>
           </el-badge>
           <div class="m-theme"><i class="iconfont">&#xe653;</i></div>
-          <div class="m-abridge"><i class="iconfont">&#xea6b;</i></div>
+          <div class="m-abridge" @click="openMini">
+            <i class="iconfont">&#xea6b;</i>
+          </div>
         </div>
       </div>
     </div>
@@ -40,6 +42,8 @@
 
 <script>
 import GSearch from "@/components/common/Search";
+import { ipcRenderer } from "electron";
+
 export default {
   components: {
     GSearch
@@ -114,6 +118,11 @@ export default {
     },
     getMsgProvate() {
       this.$store.dispatch("getMsgProvate");
+    },
+    openMini() {
+      console.log("1321");
+
+      ipcRenderer.send("changeMini");
     }
   }
 };

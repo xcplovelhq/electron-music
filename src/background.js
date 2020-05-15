@@ -5,21 +5,25 @@ import {
   createProtocol
   /* installVueDevtools */
 } from "vue-cli-plugin-electron-builder/lib";
-import "./store";
 const isDevelopment = process.env.NODE_ENV !== "production";
 const path = require("path");
+import "./store";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
 let loginWin;
+let miniModel;
 let winURL;
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
-
-function createWindow() {
+winURL =
+  process.env.NODE_ENV === "development"
+    ? `${process.env.WEBPACK_DEV_SERVER_URL}`
+    : `file://${__dirname}/index.html`;
+function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1200,
@@ -28,6 +32,7 @@ function createWindow() {
     height: 650,
     titleBarStyle: "hiddenInset",
     icon: path.join(__dirname, "bundled/img/logo.png"),
+    skipTaskbar: true,
     webPreferences: {
       nodeIntegration: true
     }
@@ -50,7 +55,7 @@ function createWindow() {
     win = null;
   });
 }
-function openWin() {
+function openWin () {
   loginWin = new BrowserWindow({
     // resizable: false,
     width: 350,
@@ -61,10 +66,7 @@ function openWin() {
       nodeIntegration: true
     }
   });
-  winURL =
-    process.env.NODE_ENV === "development"
-      ? `${process.env.WEBPACK_DEV_SERVER_URL}`
-      : `file://${__dirname}/index.html`;
+
   // win.loadURL(winURL);
   loginWin.webContents.openDevTools({ mode: "right" });
 
@@ -73,7 +75,42 @@ function openWin() {
     loginWin = null;
   });
 }
+function openMiniModel () {
+  miniModel = new BrowserWindow({
+    // width: 333,
+    // height: 333,
+    frame: false,
+    show: false,
+    titleBarStyle: "default",
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
+
+  // win.loadURL(winURL);
+  miniModel.webContents.openDevTools({ mode: "right" });
+
+  miniModel.loadURL(winURL + "#/miniModel");
+  miniModel.on("closed", () => {
+    miniModel = null;
+  });
+}
+
+ipcMain.on("play", () => {
+  win.webContents.send("play", 1);
+  console.log("321321");
+});
 ipcMain.on("openWin", () => openWin());
+ipcMain.on("changeMini", () => {
+  if (win.isVisible()) {
+    miniModel.show();
+    win.hide();
+  } else {
+    miniModel.hide();
+    win.show();
+  }
+});
+
 ipcMain.on("login", () => {
   loginWin.close();
 });
@@ -86,9 +123,12 @@ ipcMain.on("setUserInfo", (e, data) => {
 ipcMain.on("openUrl", (e, data) => {
   shell.openExternal(data);
 });
-// ipcMain.on("control", () => {
-//   win.webContents.send("control", "play");
-// });
+ipcMain.on("control", (e, data) => {
+  win.webContents.send("control", data);
+});
+ipcMain.on("setMiniInfo", (e, data) => {
+  miniModel.webContents.send("getMiniInfo", data);
+});
 app.setName("网易云音乐");
 
 // 菜单
@@ -290,6 +330,7 @@ app.on("ready", async () => {
   Menu.setApplicationMenu(menu);
 
   createWindow();
+  openMiniModel();
 });
 
 // Exit cleanly on request from parent process in development mode.

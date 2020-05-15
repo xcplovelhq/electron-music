@@ -114,7 +114,7 @@
         content=""
       >
         <el-slider
-          v-model="volume"
+          :value="volume"
           :min="0"
           :max="1"
           :step="0.01"
@@ -124,7 +124,7 @@
           @input="handleVolume"
         ></el-slider>
       </el-popover>
-      <div class="m-volume" v-popover:popover @click="a = !a">
+      <div class="m-volume" v-popover:popover>
         <i class="iconfont">&#xe87a;</i>
       </div>
     </div>
@@ -144,7 +144,7 @@ export default {
   components: {
     MyImage
   },
-  data () {
+  data() {
     return {
       time: "",
       volume: 0,
@@ -180,17 +180,23 @@ export default {
       ]
     };
   },
-  created () {
+  created() {
     ipcRenderer.on("control", (event, data) => {
-      switch (data) {
+      switch (data.type) {
         case "play":
           this.handleClick("PLAY");
           break;
         case "next":
+          console.log(321321);
+
           this.handleClick("NEXT");
           break;
         case "prev":
           this.handleClick("PREV");
+          break;
+        case "volume":
+          this.volume = data.data;
+          this.audio.volume = this.volume;
           break;
         default:
           break;
@@ -199,7 +205,7 @@ export default {
     });
     this.getSongUrlData();
   },
-  mounted () {
+  mounted() {
     // let self = this;
     this.audio = this.$refs.audio;
     this.volume = this.$store.state.Play.volume;
@@ -219,14 +225,14 @@ export default {
   computed: {
     ...mapActions(["getSongUrl"]),
 
-    getCurrentTime () {
+    getCurrentTime() {
       return moment(this.currentTime * 1000).format("mm:ss");
     },
-    getPlayInfo () {
+    getPlayInfo() {
       return this.$store.state.Play.playInfo;
     },
 
-    getMusicUrl () {
+    getMusicUrl() {
       let url = "";
       let playUrls = this.$store.state.Play.playUrls;
       playUrls.forEach(item => {
@@ -236,7 +242,7 @@ export default {
       });
       return url;
     },
-    playing () {
+    playing() {
       if (this.$store.state.Play.isPlay) {
         this.audio && this.audio.play();
       } else {
@@ -245,12 +251,12 @@ export default {
       return this.$store.state.Play.isPlay;
     },
 
-    getFm () {
+    getFm() {
       return this.$store.state.Play.isFM;
     }
   },
   methods: {
-    openPlaying () {
+    openPlaying() {
       if (!this.getFm) {
         this.$store.commit(
           "CHANGE_PLAYING_DRAWER_STATUS",
@@ -258,25 +264,25 @@ export default {
         );
       }
     },
-    getSongName (item, idx) {
+    getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    handleLike () { },
-    getIsLike () {
+    handleLike() {},
+    getIsLike() {
       return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
     },
-    openList () {
+    openList() {
       this.$store.commit("SET_DRAWER_TYPE", "playList");
       this.$store.commit(
         "CHANGE_DRAWER_STATUS",
         !this.$store.state.isShowDrawer
       );
     },
-    handleLook () {
+    handleLook() {
       this.loopId++;
       if (this.loopId > 3) {
         this.loopId = 0;
@@ -284,28 +290,38 @@ export default {
       this.loopValue = this.loopList[this.loopId].index;
       this.$store.commit("SET_LOOP", this.loopValue);
     },
-    handleVolume () {
+    handleVolume(volume) {
+      this.volume = volume;
       this.audio.volume = this.volume;
       this.$store.commit("SET_VOLUME", this.volume);
+      ipcRenderer.send("setMiniInfo", { type: "volume", data: this.volume });
     },
-    getDuration (e) {
+    getDuration(e) {
       this.duration = Math.floor(e.target.duration);
       this.time = moment(e.target.duration * 1000).format("mm:ss");
+      ipcRenderer.send("setMiniInfo", {
+        type: "duration",
+        data: this.duration
+      });
     },
-    getTimeupdate (e) {
+    getTimeupdate(e) {
       this.currentTime = Math.floor(e.target.currentTime);
       this.$store.commit("SET_CURRENT_TIME", e.target.currentTime);
+      ipcRenderer.send("setMiniInfo", {
+        type: "currentTime",
+        data: this.currentTime
+      });
     },
-    getEnded () {
+    getEnded() {
       this.getPLayList("NEXT", "END");
     },
-    handleChange () {
+    handleChange() {
       this.audio.currentTime = this.currentTime;
     },
-    handleInput () {
+    handleInput() {
       // this.currentTime = row;
     },
-    getPLayList (type, status) {
+    getPLayList(type, status) {
       let tracks = this.$store.state.Play.playList;
       let row = this.$store.state.Play.playInfo;
       let nextRow = {};
@@ -348,14 +364,10 @@ export default {
         }
       });
     },
-    handleClick (type) {
+    handleClick(type) {
       switch (type) {
         case "PLAY":
-          if (!this.$store.state.Play.isPlay) {
-            this.$store.commit("SET_ISPLAY", true);
-          } else {
-            this.$store.commit("SET_ISPLAY", false);
-          }
+          this.$store.commit("SET_ISPLAY", !this.$store.state.Play.isPlay);
           break;
         case "NEXT":
           this.getPLayList("NEXT");
@@ -370,7 +382,7 @@ export default {
           break;
       }
     },
-    getSongUrlData () {
+    getSongUrlData() {
       if (this.$store.state.Play.playDetails) {
         this.$store.dispatch("getSongUrl", {
           id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
@@ -392,13 +404,12 @@ export default {
   padding: 0 30px 0 10px;
   border-top: 2px solid #f5f5f5;
   background: #fff;
-  z-index: 10000;
+  z-index: 1000;
   .m-slider {
     position: absolute;
     left: 0;
     top: -2px;
     width: 100%;
-    z-index: 10000;
     .el-slider {
       &:hover {
         .el-slider__button {
@@ -446,7 +457,6 @@ export default {
       height: 39px;
       border-radius: 4px;
       overflow: hidden;
-      background: rgba(0, 0, 0, 0.5);
       &.active,
       &:hover {
         .m-warper {

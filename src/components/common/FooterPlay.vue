@@ -187,8 +187,6 @@ export default {
           this.handleClick("PLAY");
           break;
         case "next":
-          console.log(321321);
-
           this.handleClick("NEXT");
           break;
         case "prev":
@@ -196,12 +194,11 @@ export default {
           break;
         case "volume":
           this.volume = data.data;
-          this.audio.volume = this.volume;
+          this.audio.volume = data.data;
           break;
         default:
           break;
       }
-      // ipcRenderer.send("control", "play");
     });
     this.getSongUrlData();
   },
@@ -231,7 +228,6 @@ export default {
     getPlayInfo() {
       return this.$store.state.Play.playInfo;
     },
-
     getMusicUrl() {
       let url = "";
       let playUrls = this.$store.state.Play.playUrls;
@@ -291,10 +287,9 @@ export default {
       this.$store.commit("SET_LOOP", this.loopValue);
     },
     handleVolume(volume) {
-      this.volume = volume;
-      this.audio.volume = this.volume;
-      this.$store.commit("SET_VOLUME", this.volume);
-      ipcRenderer.send("setMiniInfo", { type: "volume", data: this.volume });
+      this.audio.volume = volume;
+      this.$store.commit("SET_VOLUME", volume);
+      ipcRenderer.send("setMiniInfo", { type: "volume", data: volume });
     },
     getDuration(e) {
       this.duration = Math.floor(e.target.duration);
@@ -388,6 +383,11 @@ export default {
           id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
         });
       }
+    }
+  },
+  watch: {
+    getVolume(data) {
+      this.audio.volume = data;
     }
   }
 };

@@ -9,7 +9,7 @@ const state = {
   playList: getStorage("playList") || [], //播放列表
   playUrls: getStorage("playUrls") || [], // 播放列表url
   playLyric: getStorage("playLyric") || {}, // 歌词
-  isPlay: getStorage("isPlay") || false, // 是否播放
+  isPlay: false, // 是否播放
   isNext: false, // 是否下一首
   volume: getStorage("volume") || 1, // 音量
   loop: getStorage("loop") || "order", // 播放模式
@@ -20,7 +20,7 @@ const state = {
 };
 const getters = {};
 const mutations = {
-  SET_PLAY_INFO (state, data) {
+  SET_PLAY_INFO(state, data) {
     storage("playInfo", data);
     state.playInfo = data;
     // const option = {
@@ -35,56 +35,56 @@ const mutations = {
     //   console.log("clicked");
     // };
   },
-  GET_PLAY_INFO (state) {
+  GET_PLAY_INFO(state) {
     state.playInfo = getStorage("playInfo");
   },
-  SET_PLAY_DETAILS (state, data) {
+  SET_PLAY_DETAILS(state, data) {
     storage("playDetails", data);
     state.playDetails = data;
   },
-  SET_PLAY_LIST (state, data) {
+  SET_PLAY_LIST(state, data) {
     storage("playList", data);
     state.playList = data;
   },
-  SET_PLAY_URLS (state, data) {
+  SET_PLAY_URLS(state, data) {
     state.playUrls = data;
   },
-  SET_ISPLAY (state, data) {
-    storage("isPlay", data);
+  SET_ISPLAY(state, data) {
+    // storage("isPlay", data);
     state.isPlay = data;
   },
-  SET_ISNEXT (state, data) {
+  SET_ISNEXT(state, data) {
     state.isNext = data;
   },
-  SET_VOLUME (state, data) {
+  SET_VOLUME(state, data) {
     storage("volume", data);
     state.volume = data;
   },
-  SET_LOOP (state, data) {
+  SET_LOOP(state, data) {
     storage("loop", data);
     state.loop = data;
   },
-  SET_LYRIC (state, data) {
+  SET_LYRIC(state, data) {
     state.playLyric = data;
   },
-  SET_CURRENT_TIME (state, data) {
+  SET_CURRENT_TIME(state, data) {
     state.currentTime = data;
   },
-  SET_FM (state, data) {
+  SET_FM(state, data) {
     storage("isFm", data);
     state.isFM = data;
   },
-  SET_FM_INFO (state, data) {
+  SET_FM_INFO(state, data) {
     storage("fmInfo", data);
     state.fmInfo = data;
   },
-  SET_FM_LYRIC (state, data) {
+  SET_FM_LYRIC(state, data) {
     storage("fmLyric", data);
     state.fmLyric = data;
   }
 };
 const actions = {
-  async getSongUrl ({ commit }, payload) {
+  async getSongUrl({ commit }, payload) {
     let { data } = await api.musicData.getSongUrl(payload);
     if (data.code === 200) {
       storage("playUrls", data.data);
@@ -92,7 +92,7 @@ const actions = {
       return data ? data : {};
     }
   },
-  async getLyric ({ commit }, payload) {
+  async getLyric({ commit }, payload) {
     console.log(payload);
 
     let { data } = await api.musicData.getLyric(payload);
@@ -107,13 +107,13 @@ const actions = {
       return data ? data : {};
     }
   },
-  async getSongDetails ({ dispatch, commit, state }, payload) {
+  async getSongDetails({ dispatch, commit, state }, payload) {
     let playList = state.playList;
     let playInfo = state.playInfo;
-    let playIdx = playList.findIndex(function (obj) {
+    let playIdx = playList.findIndex(function(obj) {
       return obj ? obj.id === playInfo.id : -1;
     });
-    let rowIdx = playList.findIndex(function (obj) {
+    let rowIdx = playList.findIndex(function(obj) {
       return obj ? obj.id === payload.ids : -1;
     });
     if (rowIdx >= 0) {

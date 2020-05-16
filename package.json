@@ -58,6 +58,7 @@
     "vue-cli-plugin-style-resources-loader": "^0.1.4",
     "vue-template-compiler": "^2.6.11",
     "vue-toasted": "^1.1.28",
-    "vuedraggable": "^2.23.2"
+    "vuedraggable": "^2.23.2",
+    "vuex-shared-mutations": "^1.0.2"
   }
 }

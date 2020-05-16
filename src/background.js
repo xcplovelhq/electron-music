@@ -5,9 +5,9 @@ import {
   createProtocol
   /* installVueDevtools */
 } from "vue-cli-plugin-electron-builder/lib";
+
 const isDevelopment = process.env.NODE_ENV !== "production";
 const path = require("path");
-import "./store";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -34,6 +34,7 @@ function createWindow () {
     icon: path.join(__dirname, "bundled/img/logo.png"),
     skipTaskbar: true,
     webPreferences: {
+      scrollBounce: true,
       nodeIntegration: true
     }
   });
@@ -55,6 +56,7 @@ function createWindow () {
     win = null;
   });
 }
+
 function openWin () {
   loginWin = new BrowserWindow({
     // resizable: false,
@@ -77,8 +79,12 @@ function openWin () {
 }
 function openMiniModel () {
   miniModel = new BrowserWindow({
-    // width: 333,
-    // height: 333,
+    width: 500,
+    height: 500,
+    // maxWidth: 500,
+    // maxHeight: 500,
+    // minWidth: 220,
+    // minHeight: 220,
     frame: false,
     show: false,
     titleBarStyle: "default",
@@ -91,6 +97,13 @@ function openMiniModel () {
   miniModel.webContents.openDevTools({ mode: "right" });
 
   miniModel.loadURL(winURL + "#/miniModel");
+  miniModel.on("resize", () => {
+    miniModel.webContents.send("getSize", miniModel.getBounds());
+  });
+  miniModel.setMaximumSize(600, 600);
+  miniModel.setMinimumSize(320, 320);
+  miniModel.setAspectRatio(1);
+
   miniModel.on("closed", () => {
     miniModel = null;
   });
@@ -98,7 +111,6 @@ function openMiniModel () {
 
 ipcMain.on("play", () => {
   win.webContents.send("play", 1);
-  console.log("321321");
 });
 ipcMain.on("openWin", () => openWin());
 ipcMain.on("changeMini", () => {
@@ -129,6 +141,27 @@ ipcMain.on("control", (e, data) => {
 ipcMain.on("setMiniInfo", (e, data) => {
   miniModel.webContents.send("getMiniInfo", data);
 });
+ipcMain.on("setBounds", (e, data, isShow, type) => {
+  if (isShow) {
+    if (type === "list") {
+      miniModel.setMaximumSize(600, 1000);
+      miniModel.setMinimumSize(320, 320);
+    } else {
+      miniModel.setMaximumSize(500, 50);
+      miniModel.setMinimumSize(320, 50);
+    }
+    miniModel.setAspectRatio(0);
+  } else {
+    miniModel.setMaximumSize(600, 600);
+    miniModel.setMinimumSize(320, 320);
+    miniModel.setAspectRatio(1);
+  }
+  miniModel.setBounds({ height: data }, true);
+});
+ipcMain.on("getBounds", e => {
+  e.returnValue = miniModel.getBounds();
+});
+
 app.setName("网易云音乐");
 
 // 菜单

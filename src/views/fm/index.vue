@@ -56,30 +56,7 @@
               >
             </div>
           </div>
-          <div
-            class="m-lyric"
-            ref="lyric"
-            :class="{ 'm-no': getLyric.length === 0 }"
-          >
-            <Loading v-if="isLoading"></Loading>
-            <template v-else>
-              <ul v-if="getLyric && getLyric.length > 0">
-                <template v-for="(item, idx) in getLyric">
-                  <li
-                    :key="item.key"
-                    :class="{ active: getActiveLyric(item, idx) }"
-                    :ref="getActiveLyric(item, idx) && 'itemLyric'"
-                  >
-                    <p>{{ item.lyric }}</p>
-                    <p v-if="item.tlyric">{{ item.tlyric }}</p>
-                  </li>
-                </template>
-              </ul>
-              <div v-else>
-                纯音乐，请你欣赏
-              </div>
-            </template>
-          </div>
+          <Lyric type="fm"></Lyric>
         </div>
       </div>
       <div class="flex-justify-between" style="margin-top:60px">
@@ -97,21 +74,20 @@
 import { getSingerName, getSum } from "@/lib/utils";
 import CommentList from "@/components/CommentList";
 import MyImage from "@/components/Image";
-import Loading from "@/components/Loading";
+// import Loading from "@/components/Loading";
+import Lyric from "@/components/Lyric";
 
 export default {
   components: {
     MyImage,
     CommentList,
-    Loading
+    // Loading,
+    Lyric
   },
   data() {
     return {
       // pattern: /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]/g,
       isLoading: false,
-      pattern: /(\[\d{2}:\d{2}\.\d{2,3}\])/g,
-      pattern2: /[\r\n]/g,
-      lyricIdx: 0,
       playIdx: 0,
       type: "playing",
       list: [],
@@ -135,37 +111,6 @@ export default {
     },
     getFm() {
       return this.$store.state.Play.isFM;
-    },
-    getLyric() {
-      let newLyric = [];
-      let fmLyric = this.$store.state.Play.fmLyric;
-      if (fmLyric.lrc && fmLyric.lrc.lyric) {
-        let lyric = fmLyric.lrc.lyric;
-        let lyricArr = lyric.split(this.pattern).slice(1);
-        console.log();
-
-        lyricArr.forEach((item, idx) => {
-          if (idx % 2 === 0) {
-            newLyric.push({
-              time: this.setTime(lyricArr[idx]),
-              lyric: lyricArr[idx + 1]
-            });
-          }
-        });
-        if (fmLyric.tlyric.lyric) {
-          let tlyricArr = fmLyric.tlyric.lyric.split(this.pattern).slice(1);
-          tlyricArr.forEach((item, idx) => {
-            if (idx % 2 === 0) {
-              newLyric.forEach((v, i) => {
-                if (v.time === this.setTime(tlyricArr[idx])) {
-                  newLyric[i].tlyric = tlyricArr[idx + 1];
-                }
-              });
-            }
-          });
-        }
-      }
-      return newLyric;
     }
   },
   created() {
@@ -192,37 +137,13 @@ export default {
         return "old";
       }
     },
-    setTime(data) {
-      let time = data.slice(1, -1);
-      if (time.indexOf(":") >= 0) {
-        time = time.replace(":", "").replace(".", "");
-      }
 
-      return time;
-    },
     getPlayCount(row) {
       return getSum(row.playCount);
     },
 
     getSingerName(row, idx) {
       return getSingerName(row, idx);
-    },
-    getCurrentTime() {
-      let currentTime = (this.$store.state.Play.currentTime * 1000).toFixed(0);
-      return this.$moment(+currentTime).format("mmssSSS");
-    },
-
-    getActiveLyric(row, idx) {
-      if (
-        row.time < this.getCurrentTime() &&
-        this.lyricIdx <= idx &&
-        this.getFm
-      ) {
-        this.lyricIdx = idx;
-        return true;
-      } else {
-        return false;
-      }
     },
     getPersonalFm() {
       this.$api.userData.getPersonalFm().then(({ data }) => {

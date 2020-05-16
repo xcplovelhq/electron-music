@@ -50,28 +50,7 @@
               来源：<router-link to="">{{ getPlayDetails.name }}</router-link>
             </div>
           </div>
-          <div
-            class="m-lyric"
-            ref="lyric"
-            :class="{ 'm-no': getLyric.length === 0 }"
-          >
-            <ul v-if="getLyric && getLyric.length > 0">
-              <template v-for="(item, idx) in getLyric">
-                <li
-                  :key="item.key"
-                  :class="{ active: getActiveLyric(item, idx) }"
-                  :ref="getActiveLyric(item, idx) && 'itemLyric'"
-                >
-                  <p>{{ item.lyric }}</p>
-                  <p v-if="item.tlyric">{{ item.tlyric }}</p>
-                  <!-- {{ item }} -->
-                </li>
-              </template>
-            </ul>
-            <div v-else>
-              纯音乐，请你欣赏
-            </div>
-          </div>
+          <Lyric></Lyric>
           <!-- {{ getLyricTime }} -->
         </div>
       </div>
@@ -134,15 +113,16 @@ import { getSingerName, getSum } from "@/lib/utils";
 import CommentList from "@/components/CommentList";
 // import Loading from "@/components/Loading";
 import MyImage from "@/components/Image";
-
+import Lyric from "@/components/Lyric";
 export default {
   components: {
     MyImage,
     CommentList,
     // Loading,
-    mImage
+    mImage,
+    Lyric
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       // pattern: /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]/g,
@@ -174,102 +154,38 @@ export default {
     };
   },
   computed: {
-    getPlayInfo () {
+    getPlayInfo() {
       return this.$store.state.Play.playInfo;
     },
-    getPlayDetails () {
+    getPlayDetails() {
       return this.$store.state.Play.playDetails;
     },
-    playing () {
+    playing() {
       return this.$store.state.Play.isPlay;
-    },
-
-    getLyric () {
-      let newLyric = [];
-      let playLyric = this.$store.state.Play.playLyric;
-      let lyric = playLyric.lrc.lyric;
-      let lyricArr = lyric.split(this.pattern).slice(1);
-
-      lyricArr.forEach((item, idx) => {
-        if (idx % 2 === 0) {
-          newLyric.push({
-            time: this.setTime(lyricArr[idx]),
-            lyric: lyricArr[idx + 1]
-          });
-        }
-      });
-      if (playLyric.tlyric.lyric) {
-        let tlyricArr = playLyric.tlyric.lyric.split(this.pattern).slice(1);
-        tlyricArr.forEach((item, idx) => {
-          if (idx % 2 === 0) {
-            newLyric.forEach((v, i) => {
-              if (v.time === this.setTime(tlyricArr[idx])) {
-                newLyric[i].tlyric = tlyricArr[idx + 1];
-              }
-            });
-          }
-        });
-      }
-      return newLyric;
-    },
-    getLyricTime () {
-      const lyric = this.$store.state.Play.playLyric.lrc.lyric;
-      const arr = lyric.match(this.pattern);
-      return arr;
     }
   },
-  created () {
+  created() {
     this.getSimiPlaylist();
     this.getSimiSong();
     this.getSimiUser();
   },
   methods: {
-    handleBack () {
+    handleBack() {
       this.$store.commit("CHANGE_PLAYING_DRAWER_STATUS", false);
     },
-    setTime (data) {
-      let time = data.slice(1, -1);
-      if (time.indexOf(":") >= 0) {
-        time = time.replace(":", "").replace(".", "");
-      }
 
-      return time;
-    },
-    getPlayCount (row) {
+    getPlayCount(row) {
       return getSum(row.playCount);
     },
 
-    getSingerName (row, idx) {
+    getSingerName(row, idx) {
       return getSingerName(row, idx);
     },
-    getCurrentTime () {
+    getCurrentTime() {
       let currentTime = (this.$store.state.Play.currentTime * 1000).toFixed(0);
-
-      // if (currentTime > 0) {
-      //   this.offsetTop =
-      //     this.$refs.itemLyric && this.$refs.itemLyric[0].offsetTop;
-      //   console.log(this.offsetTop);
-      //   this.$nextTick(() => {
-      //     //图片列表栏始终左对齐
-      //     this.$refs.lyric.scrollTo({
-      //       top: this.offsetTop,
-      //       behavior: "smooth"
-      //     });
-      //   });
-      // }
-
       return this.$moment(+currentTime).format("mmssSSS");
     },
-
-    getActiveLyric (row, idx) {
-      if (row.time < this.getCurrentTime() && this.lyricIdx <= idx) {
-        this.lyricIdx = idx;
-        return true;
-      } else {
-        return false;
-      }
-    },
-    getSimiPlaylist () {
+    getSimiPlaylist() {
       this.$api.songData
         .getSimiPlaylist({
           id: this.getPlayInfo.id
@@ -278,7 +194,7 @@ export default {
           this.rightList[0].list = data.playlists;
         });
     },
-    getSimiSong () {
+    getSimiSong() {
       this.$api.musicData
         .getSimiSong({
           id: this.getPlayInfo.id
@@ -287,7 +203,7 @@ export default {
           this.rightList[1].list = data.songs;
         });
     },
-    getSimiUser () {
+    getSimiUser() {
       this.$api.userData
         .getSimiUser({
           id: this.getPlayInfo.id

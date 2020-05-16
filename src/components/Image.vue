@@ -12,8 +12,11 @@
   >
     <div class="m-img">
       <el-image :src="getImgUrl" fit="fill" style="width: 100%; height: 100%">
-        <div class="m-error" slot="placeholder">
+        <div class="m-error" slot="placeholder" v-if="!defaultBg">
           <i slot="placeholder" class="iconfont">&#xe635;</i>
+        </div>
+        <div class="m-error" slot="placeholder" v-else>
+          <img src="~@/assets/mini-default.png" />
         </div>
         <div class="m-error" slot="error">
           <i slot="placeholder" class="iconfont">&#xe635;</i>
@@ -35,6 +38,7 @@
 export default {
   props: {
     ImgUrl: String,
+    defaultBg: Boolean,
     Size: String || Number,
     Radius: String || Number,
     MinWidth: String || Number,
@@ -130,6 +134,10 @@ export default {
     justify-content: center;
     text-align: center;
     background: #e0e0e0;
+    img {
+      width: 100%;
+      height: 100%;
+    }
     .iconfont {
       font-size: 4em;
       color: #fff;

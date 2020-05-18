@@ -3,7 +3,7 @@
     <div
       class="m-bg"
       @click="isShowLyric = !isShowLyric"
-      :class="{ show: isShowLyric }"
+      :class="{ show: isShowLyric, hide: isShow }"
     >
       <my-image
         class="bg"
@@ -24,7 +24,7 @@
         <div @click="handleChangeMini">□</div>
       </div>
       <div class="m-lyric-box">
-        <Lyric></Lyric>
+        <Lyric :isTranslate="true"></Lyric>
       </div>
       <div
         class="m-header"
@@ -187,7 +187,7 @@ export default {
     MyImage,
     Lyric
   },
-  data () {
+  data() {
     return {
       id: 0,
       width: 0,
@@ -201,7 +201,7 @@ export default {
     };
   },
   computed: {
-    getBG () {
+    getBG() {
       return (
         (this.getPlayInfo &&
           this.getPlayInfo.al &&
@@ -209,23 +209,23 @@ export default {
         this.getPlayInfo.album.picUrl
       );
     },
-    getList () {
+    getList() {
       return this.$store.state.Play.playList;
     },
-    playing () {
+    playing() {
       return this.$store.state.Play.isPlay;
     },
-    getPlayInfo () {
+    getPlayInfo() {
       return this.$store.state.Play.playInfo;
     },
-    getFm () {
+    getFm() {
       return this.$store.state.Play.isFM;
     },
-    getIsLike () {
+    getIsLike() {
       return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
     }
   },
-  created () {
+  created() {
     ipcRenderer.on("getMiniInfo", (event, data) => {
       switch (data.type) {
         case "currentTime":
@@ -246,14 +246,14 @@ export default {
       this.height = data.height;
     });
   },
-  mounted () {
+  mounted() {
     this.volume = this.$store.state.Play.volume;
 
     this.width = ipcRenderer.sendSync("getBounds").width;
     this.height = ipcRenderer.sendSync("getBounds").width;
   },
   methods: {
-    getSongName (item, idx) {
+    getSongName(item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
@@ -261,13 +261,13 @@ export default {
       }
     },
 
-    handleChangeMini () {
+    handleChangeMini() {
       ipcRenderer.send("changeMini");
     },
-    handleChange () { },
-    handleInput () { },
-    handleLike () { },
-    handleOpen () {
+    handleChange() {},
+    handleInput() {},
+    handleLike() {},
+    handleOpen() {
       this.height = ipcRenderer.sendSync("getBounds").height;
       // ipcRenderer.on("getBoundsData", function (e, data) {
       // });
@@ -283,11 +283,11 @@ export default {
         ipcRenderer.send("setBounds", this.width, this.isShowList, "list");
       }
     },
-    handleVolume (volume) {
+    handleVolume(volume) {
       this.volume = volume;
       ipcRenderer.send("control", { type: "volume", data: volume });
     },
-    handleClick (type) {
+    handleClick(type) {
       if (type === "play") {
         this.$store.commit("SET_ISPLAY", !this.$store.state.Play.isPlay);
       } else {
@@ -295,13 +295,11 @@ export default {
       }
       ipcRenderer.send("control", { type: type });
     },
-    openPlaying () {
+    openPlaying() {
       this.isShow = !this.isShow;
       if (this.isShow) {
         ipcRenderer.send("setBounds", 50, this.isShow, "window");
       } else {
-        console.log(this.width);
-
         ipcRenderer.send("setBounds", this.width, this.isShow, "window");
       }
     }
@@ -633,6 +631,12 @@ export default {
       .m-lyric-box {
         visibility: visible;
         opacity: 1;
+      }
+    }
+    &.hide {
+      .m-footer,
+      .m-header {
+        display: flex;
       }
     }
   }

@@ -31,6 +31,7 @@
         }"
       ></div>
     </div>
+    <slot name="btn"></slot>
   </div>
 </template>
 

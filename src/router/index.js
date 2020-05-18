@@ -23,6 +23,8 @@ import UserFollowFans from "@/views/user/user-follow-fans";
 import UserDynamic from "@/views/user/user-dynamic";
 import DynamicDetails from "@/views/user/dynamic-details";
 import MiniModel from "@/views/mini-model/";
+import FullScreen from "@/views/full-screen/";
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -142,6 +144,11 @@ const routes = [
     path: "/miniModel",
     name: "miniModel",
     component: MiniModel
+  },
+  {
+    path: "/fullScreen",
+    name: "fullScreen",
+    component: FullScreen
   }
 ];
 

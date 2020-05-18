@@ -188,6 +188,10 @@ export default {
     ...mapActions(["loginCellphone", "getUserPlaylist", "getUserLikelist"]),
     handleLogin() {
       if (getStorage("userInfo")) {
+        this.$router.push({
+          name: "fullScreen"
+        });
+
         console.log("321");
       } else {
         ipcRenderer.send("openWin");

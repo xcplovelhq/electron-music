@@ -2,10 +2,10 @@
   <div class="g-footer-play">
     <div class="m-slider">
       <el-slider
-        v-model="currentTime"
+        :value="getCurrentTime"
         @change="handleChange"
         @input="handleInput"
-        :max="duration"
+        :max="getDuration"
         :show-tooltip="false"
       ></el-slider>
     </div>
@@ -55,20 +55,13 @@
               >
             </div>
           </div>
-          <div class="m-song-time">{{ getCurrentTime }}/{{ time }}</div>
+          <div class="m-song-time">
+            {{ $moment(getCurrentTime * 1000).format("mm:ss") }}/{{
+              $moment(getDuration * 1000).format("mm:ss")
+            }}
+          </div>
         </div>
       </template>
-    </div>
-    <div class="m-audio">
-      <audio
-        ref="audio"
-        :src="getMusicUrl"
-        :autoplay="playing"
-        @durationchange="getDuration"
-        @timeupdate="getTimeupdate"
-        @ended="getEnded"
-        preload="auto"
-      ></audio>
     </div>
     <div class="m-play-btn">
       <div class="m-collect">
@@ -90,16 +83,7 @@
       <div class="m-share"><i class="iconfont">&#xe60c;</i></div>
     </div>
     <div class="m-play-order">
-      <div class="m-loop" @click="handleLook" v-if="!getFm">
-        <el-tooltip
-          class="item"
-          effect="dark"
-          :content="loopList[loopId].name"
-          placement="top"
-        >
-          <i title="1" class="iconfont" v-html="loopList[loopId].icon"></i>
-        </el-tooltip>
-      </div>
+      <Loop v-if="!getFm"></Loop>
       <div class="m-list" @click="openList" v-if="!getFm">
         <i class="iconfont" :class="{ active: $store.state.isShowDrawer }"
           >&#xe634;</i
@@ -132,17 +116,17 @@
 </template>
 
 <script>
-import moment from "moment";
 import { getStorage } from "@/lib/store";
 import { ipcRenderer } from "electron";
 import { shuffle } from "@/lib/utils";
 import { mapActions } from "vuex";
 import MyImage from "@/components/Image";
-
+import Loop from "@/components/Loop";
 // import { throttle } from "@/lib/utils";
 export default {
   components: {
-    MyImage
+    MyImage,
+    Loop
   },
   data() {
     return {
@@ -153,31 +137,7 @@ export default {
       duration: 0,
       audio: null,
       isPlay: false,
-      loopId: 0,
-      loopValue: "order",
-      randomMusic: [],
-      loopList: [
-        {
-          index: "order",
-          name: "顺序播放",
-          icon: "&#xe608;"
-        },
-        {
-          index: "list",
-          name: "列表循环",
-          icon: "&#xe66c;"
-        },
-        {
-          index: "single",
-          name: "单曲循环",
-          icon: "&#xe66d;"
-        },
-        {
-          index: "random",
-          name: "随机播放",
-          icon: "&#xe66b;"
-        }
-      ]
+      randomMusic: []
     };
   },
   created() {
@@ -193,25 +153,19 @@ export default {
           this.handleClick("PREV");
           break;
         case "volume":
-          this.volume = data.data;
-          this.audio.volume = data.data;
+          this.$store.commit("SET_VOLUME", data.data);
           break;
         default:
           break;
       }
     });
-    this.getSongUrlData();
+    // this.getSongUrlData();
   },
   mounted() {
     // let self = this;
-    this.audio = this.$refs.audio;
     this.volume = this.$store.state.Play.volume;
     this.loopValue = this.$store.state.Play.loop;
-    this.loopList.forEach((item, idx) => {
-      if (item.index === this.$store.state.Play.loop) {
-        this.loopId = idx;
-      }
-    });
+
     this.randomMusic = shuffle(this.$store.state.Play.playDetails.tracks);
     // this.audio.load();
 
@@ -223,7 +177,10 @@ export default {
     ...mapActions(["getSongUrl"]),
 
     getCurrentTime() {
-      return moment(this.currentTime * 1000).format("mm:ss");
+      return this.$store.state.Play.currentTime || 0;
+    },
+    getDuration() {
+      return this.$store.state.Play.duration || 0;
     },
     getPlayInfo() {
       return this.$store.state.Play.playInfo;
@@ -278,37 +235,9 @@ export default {
         !this.$store.state.isShowDrawer
       );
     },
-    handleLook() {
-      this.loopId++;
-      if (this.loopId > 3) {
-        this.loopId = 0;
-      }
-      this.loopValue = this.loopList[this.loopId].index;
-      this.$store.commit("SET_LOOP", this.loopValue);
-    },
     handleVolume(volume) {
-      this.audio.volume = volume;
       this.$store.commit("SET_VOLUME", volume);
       ipcRenderer.send("setMiniInfo", { type: "volume", data: volume });
-    },
-    getDuration(e) {
-      this.duration = Math.floor(e.target.duration);
-      this.time = moment(e.target.duration * 1000).format("mm:ss");
-      ipcRenderer.send("setMiniInfo", {
-        type: "duration",
-        data: this.duration
-      });
-    },
-    getTimeupdate(e) {
-      this.currentTime = Math.floor(e.target.currentTime);
-      this.$store.commit("SET_CURRENT_TIME", e.target.currentTime);
-      ipcRenderer.send("setMiniInfo", {
-        type: "currentTime",
-        data: this.currentTime
-      });
-    },
-    getEnded() {
-      this.getPLayList("NEXT", "END");
     },
     handleChange() {
       this.audio.currentTime = this.currentTime;
@@ -376,14 +305,14 @@ export default {
         default:
           break;
       }
-    },
-    getSongUrlData() {
-      if (this.$store.state.Play.playDetails) {
-        this.$store.dispatch("getSongUrl", {
-          id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
-        });
-      }
     }
+    // getSongUrlData () {
+    //   if (this.$store.state.Play.playDetails) {
+    //     this.$store.dispatch("getSongUrl", {
+    //       id: this.$store.state.Play.playDetails.tracks.map(item => item.id)
+    //     });
+    //   }
+    // }
   },
   watch: {
     getVolume(data) {

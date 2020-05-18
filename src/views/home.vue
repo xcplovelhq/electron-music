@@ -43,7 +43,6 @@
         >
           <playing></playing>
         </a-drawer>
-
         <!-- <el-drawer
           :visible="isShowDrawer"
           @open="handleOpen('base')"
@@ -84,9 +83,8 @@ import PlayList from "@/views/drawer/drawer-play-list";
 import Message from "@/views/drawer/message";
 import Playing from "@/views/drawer/playing";
 import SearchBox from "@/views/drawer/search-box";
-import Swiper from "swiper";
 import { getStorage } from "@/lib/store";
-
+import { ipcRenderer } from "electron";
 export default {
   name: "home",
   components: {
@@ -100,20 +98,22 @@ export default {
   },
   data() {
     return {
-      mySwiper: null
+      audio: null
     };
   },
   created() {
     console.log(getStorage());
     this.getData();
+    ipcRenderer.on("getFullScreen", (event, data) => {
+      if (data) {
+        this.$router.push({ name: "fullScreen" });
+      } else {
+        this.$router.back();
+      }
+    });
     // deleteStorage("playList");
   },
-  mounted() {
-    this.mySwiper = new Swiper(".swiper-container", {
-      direction: "vertical", // 垂直切换选项
-      mousewheel: true
-    });
-  },
+  mounted() {},
   computed: {
     key() {
       return this.$route.name

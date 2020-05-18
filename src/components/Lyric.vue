@@ -24,16 +24,17 @@
 <script>
 export default {
   props: {
-    type: String
+    type: String,
+    isTranslate: Boolean
   },
-  data() {
+  data () {
     return {
       lyricIdx: 0,
       pattern: /(\[\d{2}:\d{2}\.\d{2,3}\])/g
     };
   },
   computed: {
-    getLyric() {
+    getLyric () {
       let newLyric = [];
       let playLyric = this.$store.state.Play.playLyric;
       if (this.type === "fm") {
@@ -52,7 +53,7 @@ export default {
             });
           }
         });
-        if (playLyric.tlyric.lyric) {
+        if (playLyric.tlyric.lyric && !this.isTranslate) {
           let tlyricArr = playLyric.tlyric.lyric.split(this.pattern).slice(1);
           tlyricArr.forEach((item, idx) => {
             if (idx % 2 === 0) {
@@ -70,7 +71,7 @@ export default {
     }
   },
   methods: {
-    setTime(data) {
+    setTime (data) {
       let time = data.slice(1, -1);
       if (time.indexOf(":") >= 0) {
         time = time.replace(":", "").replace(".", "");
@@ -78,11 +79,11 @@ export default {
 
       return time;
     },
-    getCurrentTime() {
+    getCurrentTime () {
       let currentTime = (this.$store.state.Play.currentTime * 1000).toFixed(0);
       return this.$moment(+currentTime).format("mmssSSS");
     },
-    getActiveLyric(row, idx) {
+    getActiveLyric (row, idx) {
       if (row.time < this.getCurrentTime() && this.lyricIdx <= idx) {
         this.lyricIdx = idx;
         return true;

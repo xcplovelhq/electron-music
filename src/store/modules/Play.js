@@ -14,6 +14,7 @@ const state = {
   volume: getStorage("volume") || 1, // 音量
   loop: getStorage("loop") || "order", // 播放模式
   currentTime: "", //播放进度
+  duration: "", //播放时长
   isFM: getStorage("isFm") || false,
   fmInfo: getStorage("fmInfo") || {}, // 当前Fm歌曲信息
   fmLyric: getStorage("fmLyric") || {} // 当前Fm歌词
@@ -66,6 +67,9 @@ const mutations = {
   },
   SET_LYRIC(state, data) {
     state.playLyric = data;
+  },
+  SET_DURATION(state, data) {
+    state.duration = data;
   },
   SET_CURRENT_TIME(state, data) {
     state.currentTime = data;

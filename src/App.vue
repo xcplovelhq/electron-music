@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <router-view></router-view>
+    <my-audio></my-audio>
 
     <!-- <g-header></g-header>
     <div class="g-main">
@@ -14,6 +15,8 @@
 </template>
 
 <script>
+import MyAudio from "@/components/audio";
+
 // import GHeader from "@/components/common/Header";
 // import GNav from "@/components/common/Nav";
 // import GFooterPlay from "@/components/common/FooterPlay";
@@ -21,7 +24,9 @@
 export default {
   name: "app",
   // components: { GHeader, GNav, GFooterPlay },
-
+  components: {
+    MyAudio
+  },
   computed: {
     key() {
       return this.$route.name

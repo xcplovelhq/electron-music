@@ -30,6 +30,7 @@ function createWindow () {
     minWidth: 1000,
     minHeight: 650,
     height: 650,
+    simpleFullscreen: true,
     titleBarStyle: "hiddenInset",
     icon: path.join(__dirname, "bundled/img/logo.png"),
     skipTaskbar: true,
@@ -51,6 +52,12 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL("app://./index.html");
   }
+  win.on("enter-full-screen", () => {
+    win.webContents.send("getFullScreen", true);
+  });
+  win.on("leave-full-screen", () => {
+    win.webContents.send("getFullScreen", false);
+  });
 
   win.on("closed", () => {
     win = null;

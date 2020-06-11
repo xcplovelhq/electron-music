@@ -2,6 +2,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 import User from "./modules/User";
 import Play from "./modules/Play";
+import Video from "./modules/Video";
+
 import createMutationsSharer from "vuex-shared-mutations";
 
 Vue.use(Vuex);
@@ -27,7 +29,8 @@ const mutations = {
 export default new Vuex.Store({
   modules: {
     User,
-    Play
+    Play,
+    Video
   },
   state,
   mutations,

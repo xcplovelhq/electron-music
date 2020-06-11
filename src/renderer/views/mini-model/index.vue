@@ -179,7 +179,6 @@
 <script>
 import { ipcRenderer } from "electron";
 import MyImage from "@/components/Image";
-import { getStorage } from "@/lib/store";
 import Lyric from "@/components/Lyric";
 
 export default {
@@ -222,7 +221,7 @@ export default {
       return this.$store.state.Play.isFM;
     },
     getIsLike () {
-      return getStorage("likeMusicIds").includes(this.getPlayInfo.id);
+      return this.$store.state.User.likeMusicIds.includes(this.getPlayInfo.id);
     }
   },
   created () {

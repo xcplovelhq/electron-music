@@ -4,6 +4,7 @@
       <video
         :src="videoUrl"
         ref="video"
+        autoplay
         @dblclick="handleFull"
         @durationchange="getDuration"
         @timeupdate="getTimeupdate"
@@ -63,6 +64,30 @@
           :show-tooltip="false"
         ></el-slider>
       </div>
+      <div class="m-dialog" v-show="isShowDialog">
+        <div class="m-title">即将播放</div>
+        <div class="m-text">即将自动为您播放：{{ getVideoinfo.title }}</div>
+        <div class="m-btns">
+          <div class="m-btn-box">
+            <div class="m-dialog-btn" @click="handleReset">
+              <i class="iconfont">&#xe641;</i>
+            </div>
+            <p>重新播放</p>
+          </div>
+          <div class="m-dialog-btn" @click="handleNext">
+            <i class="iconfont">&#xe63f;</i>
+            <el-progress
+              type="circle"
+              color="#bb3d37"
+              :show-text="false"
+              :stroke-width="2"
+              :width="72"
+              :percentage="percentage"
+            >
+            </el-progress>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -73,13 +98,17 @@ export default {
     id: [String, Number],
     type: String
   },
+
   data() {
     return {
+      time: null,
       isFull: false,
+      isShowDialog: false,
       volume: 1,
       duration: 0,
       currentTime: 0,
-      isPlay: false,
+      percentage: 0,
+      isPlay: true,
       video: null,
       videoUrl: ""
     };
@@ -113,6 +142,9 @@ export default {
         ":" +
         this.$moment(this.currentTime * 1000).format("ss")
       );
+    },
+    getVideoinfo() {
+      return this.$store.state.Video.videoInfo;
     }
   },
   methods: {
@@ -122,8 +154,11 @@ export default {
     getTimeupdate(e) {
       this.currentTime = e.target.currentTime;
     },
-    getEnded(e) {
-      console.log(e);
+    getEnded() {
+      this.isShowDialog = true;
+      this.time = setInterval(() => {
+        this.percentage = this.percentage + 2;
+      }, 100);
     },
     hanldePlay() {
       setTimeout(() => {
@@ -156,6 +191,28 @@ export default {
       }
       this.isFull = !this.isFull;
     },
+    handleReset() {
+      this.isShowDialog = false;
+      this.video.load();
+      this.video.currentTime = 0;
+      this.percentage = 0;
+      clearInterval(this.time);
+      this.video.play();
+    },
+    handleNext() {
+      let id = 0;
+      this.isShowDialog = false;
+      clearInterval(this.time);
+      if (this.type === "video") {
+        id = this.getVideoinfo.vid;
+      } else {
+        id = this.getVideoinfo.id;
+      }
+      this.$router.push({
+        name: "mvDetails",
+        query: { id: id, type: this.type }
+      });
+    },
     getVideoUrl() {
       this.$api.videoData
         .getVideoUrl({
@@ -174,12 +231,33 @@ export default {
           this.videoUrl = data.data.url;
         });
     }
+  },
+  destroyed() {
+    clearInterval(this.time);
+  },
+  watch: {
+    percentage(data) {
+      if (data === 100) {
+        this.handleNext();
+      }
+    },
+    $route(to, from) {
+      if (to.name === from.name) {
+        if (this.type === "video") {
+          this.getVideoUrl();
+        } else {
+          this.getMvUrl();
+        }
+        this.percentage = 0;
+      }
+    }
   }
 };
 </script>
 
 <style lang="less" scoped>
 .g-video {
+  position: relative;
   .m-video {
     position: relative;
     width: 620px;
@@ -230,6 +308,70 @@ export default {
     &.m-isfull {
       .m-controls {
         height: 50px;
+      }
+    }
+  }
+  .m-dialog {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    .m-title {
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #707070;
+    }
+    .m-text {
+      margin-bottom: 50px;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+    .m-btns {
+      display: flex;
+      .m-btn-box {
+        text-align: center;
+        p {
+          margin-top: 10px;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.8);
+        }
+      }
+
+      .m-dialog-btn {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        margin-left: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        &:hover {
+          background: rgba(255, 255, 255, 0.8);
+        }
+        .iconfont {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 26px;
+          color: #bb3d37;
+        }
+        &:first-child {
+          margin-left: 0;
+          .iconfont {
+            font-size: 30px;
+          }
+        }
       }
     }
   }
@@ -307,6 +449,9 @@ export default {
         height: 3px;
       }
     }
+  }
+  .el-progress-circle__track {
+    stroke: rgba(255, 255, 255, 0);
   }
 }
 .m-mv-pop {

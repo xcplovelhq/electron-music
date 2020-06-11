@@ -2,7 +2,7 @@
   <div class="g-footer-play">
     <div class="m-slider">
       <el-slider
-        :value="getCurrentTime"
+        :value="slider"
         @change="handleChange"
         @input="handleInput"
         :max="getDuration"
@@ -56,7 +56,7 @@
             </div>
           </div>
           <div class="m-song-time">
-            {{ $moment(getCurrentTime * 1000).format("mm:ss") }}/{{
+            {{ $moment(slider * 1000).format("mm:ss") }}/{{
               $moment(getDuration * 1000).format("mm:ss")
             }}
           </div>
@@ -135,6 +135,7 @@ export default {
   data() {
     return {
       time: "",
+      slider: 0,
       volume: 0,
       playTime: 0,
       currentTime: 0,
@@ -170,9 +171,8 @@ export default {
   mounted() {
     // let self = this;
     this.volume = this.$store.state.Play.volume;
-    this.loopValue = this.$store.state.Play.loop;
 
-    this.randomMusic = shuffle(this.$store.state.Play.playDetails.tracks);
+    this.randomMusic = shuffle(this.$store.state.Play.playList);
     // this.audio.load();
 
     // this.audio.ontimeupdate = function() {
@@ -185,12 +185,22 @@ export default {
     getCurrentTime() {
       return this.$store.state.Play.currentTime || 0;
     },
+    getSlider() {
+      return this.$store.state.Play.slider || 0;
+    },
     getDuration() {
       return this.$store.state.Play.duration || 0;
     },
     getPlayInfo() {
       return this.$store.state.Play.playInfo;
     },
+    getLoopValue() {
+      return this.$store.state.Play.loop;
+    },
+    getIsEnd() {
+      return this.$store.state.Play.isEnd;
+    },
+
     getMusicUrl() {
       let url = "";
       let playUrls = this.$store.state.Play.playUrls;
@@ -245,11 +255,11 @@ export default {
       this.$store.commit("SET_VOLUME", volume);
       ipcRenderer.send("setMiniInfo", { type: "volume", data: volume });
     },
-    handleChange() {
-      this.audio.currentTime = this.currentTime;
+    handleChange(row) {
+      this.$store.commit("SET_SLIDER", row);
     },
-    handleInput() {
-      // this.currentTime = row;
+    handleInput(row) {
+      this.slider = row;
     },
     handleLyric() {
       if (this.$store.state.Play.isShowLyric) {
@@ -262,26 +272,13 @@ export default {
         !this.$store.state.Play.isShowLyric
       );
     },
-    getPLayList(type, status) {
+    getPLayList(type) {
       let tracks = this.$store.state.Play.playList;
       let row = this.$store.state.Play.playInfo;
       let nextRow = {};
 
-      if (this.loopValue === "random") {
+      if (this.getLoopValue === "random") {
         tracks = this.randomMusic;
-      }
-      if (status && status === "END") {
-        if (this.loopValue === "single") {
-          this.audio.currentTime = 0;
-          this.audio.load();
-          this.$store.commit("SET_ISPLAY", true);
-        } else if (this.loopValue === "order") {
-          if (row.id === tracks[tracks.length - 1].id) {
-            this.$store.commit("SET_ISPLAY", false);
-            this.$store.commit("SET_PLAY_INFO", {});
-          }
-        }
-        return;
       }
 
       tracks.forEach((item, i) => {
@@ -308,7 +305,6 @@ export default {
     handleClick(type) {
       switch (type) {
         case "PLAY":
-          console.log(type);
           this.$store.commit("SET_ISPLAY", !this.$store.state.Play.isPlay);
           break;
         case "NEXT":
@@ -339,6 +335,15 @@ export default {
   watch: {
     getVolume(data) {
       this.audio.volume = data;
+    },
+    getSlider(data) {
+      this.slider = data;
+    },
+    getCurrentTime(data) {
+      this.slider = data;
+    },
+    getIsEnd() {
+      this.getPLayList("NEXT");
     }
   }
 };
@@ -355,7 +360,7 @@ export default {
   padding: 0 30px 0 10px;
   border-top: 2px solid #f5f5f5;
   background: #fff;
-  z-index: 1000;
+  z-index: 10000;
   .m-slider {
     position: absolute;
     left: 0;

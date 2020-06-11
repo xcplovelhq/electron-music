@@ -183,6 +183,7 @@ export default {
 .g-user-dynamic {
   position: relative;
   display: flex;
+  width: 100%;
   padding: 20px 0 30px 20px;
   .m-dynamic {
     flex: 1;

@@ -77,6 +77,8 @@ import SongSheet from "@/components/SongSheet";
 import NewMusic from "./components/new-music";
 import VideoList from "./components/VideoList";
 import draggable from "vuedraggable";
+import { ipcRenderer } from "electron";
+
 export default {
   name: "find",
   components: {
@@ -147,16 +149,31 @@ export default {
     },
     handleClick(row, idx) {
       if (idx === this.bannerIdx) {
-        if (row.targetType === 1) {
-          this.$store.dispatch("getSongDetails", { ids: row.targetId });
-        } else if (row.targetType === 10) {
-          this.$router.push({
-            name: "songSheetDetails",
-            query: {
-              id: row.targetId,
-              type: "album"
-            }
-          });
+        switch (row.targetType) {
+          case 1:
+            this.$store.dispatch("getSongDetails", { ids: row.targetId });
+            break;
+          case 10:
+            this.$router.push({
+              name: "songSheetDetails",
+              query: {
+                id: row.targetId,
+                type: "album"
+              }
+            });
+            break;
+          case 3000:
+            ipcRenderer.send("openUrl", row.url);
+            break;
+          case 1004:
+            this.$router.push({
+              name: "mvDetails",
+              query: { id: row.targetId, type: "mv" }
+            });
+
+            break;
+          default:
+            break;
         }
       }
     },

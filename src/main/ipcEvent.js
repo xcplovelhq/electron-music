@@ -3,7 +3,7 @@ const path = require("path");
 
 let playIcon = path.join(__dirname, "bundled/img/tray-play.png");
 let suspendIcon = path.join(__dirname, "bundled/img/tray-suspend.png");
-export default function() {
+export default function () {
   ipcMain.on("openWin", () => {
     global.loginModel.show();
   });

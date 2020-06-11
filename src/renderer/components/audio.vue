@@ -18,8 +18,8 @@ import { ipcRenderer } from "electron";
 export default {
   mounted() {
     this.audio = this.$refs.audio;
-    console.log("321312321321");
   },
+
   computed: {
     getMusicUrl() {
       let url = "";
@@ -36,6 +36,12 @@ export default {
     },
     getVolume() {
       return this.$store.state.Play.volume;
+    },
+    getSlider() {
+      return this.$store.state.Play.slider;
+    },
+    getLoopValue() {
+      return this.$store.state.Play.loop;
     },
     playing() {
       if (this.$store.state.Play.isPlay) {
@@ -62,12 +68,29 @@ export default {
       });
     },
     getEnded() {
-      this.getPLayList("NEXT", "END");
+      let tracks = this.$store.state.Play.playList;
+      let row = this.$store.state.Play.playInfo;
+      if (this.getLoopValue === "single") {
+        this.audio.currentTime = 0;
+        this.audio.load();
+        this.$store.commit("SET_ISPLAY", true);
+      } else {
+        if (this.getLoopValue === "order") {
+          if (row.id === tracks[tracks.length - 1].id) {
+            this.$store.commit("SET_ISPLAY", false);
+            this.$store.commit("SET_PLAY_INFO", {});
+          }
+        }
+        this.$store.commit("SET_ISEND", !this.$store.state.Play.isEnd);
+      }
     }
   },
   watch: {
     getVolume(data) {
       this.audio.volume = data;
+    },
+    getSlider(data) {
+      this.audio.currentTime = data;
     }
   }
 };

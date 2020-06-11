@@ -20,7 +20,7 @@ const mutations = {
     storage("likeSongSheet", data);
     state.likeSongSheet = data;
   },
-  GET_USER_LIKE_LIST(state, data) {
+  SET_USER_LIKE_LIST(state, data) {
     storage("likeMusicIds", data);
     state.likeMusicIds = data;
   },
@@ -55,7 +55,7 @@ const actions = {
     let { data } = await api.userData.getUserLikelist(payload);
 
     if (data.code === 200) {
-      commit("GET_USER_LIKE_LIST", data.playlist);
+      commit("SET_USER_LIKE_LIST", data.ids);
       return data ? data : {};
     }
   },

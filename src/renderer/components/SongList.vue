@@ -110,6 +110,7 @@ export default {
   },
   data() {
     return {
+      isClickLike: true,
       id: 0,
       info: {}
     };
@@ -126,12 +127,18 @@ export default {
       this.info = this.details;
     }
   },
+  computed: {
+    getLikeMusicIds() {
+      return this.$store.state.User.likeMusicIds;
+    }
+  },
   methods: {
-    ...mapActions(["getUserLikelist", "getSongUrl"]),
+    ...mapActions(["getSongUrl"]),
     getIsLike(row) {
       return (
-        this.$store.state.User.likeMusicIds &&
-        this.$store.state.User.likeMusicIds.includes(row.id)
+        this.getLikeMusicIds &&
+        this.getLikeMusicIds.length > 0 &&
+        this.getLikeMusicIds.includes(row.id)
       );
     },
     handleClick(row) {
@@ -190,18 +197,31 @@ export default {
       }
     },
     handleLike(status, row) {
+      if (!this.isClickLike) {
+        return;
+      }
+      this.isClickLike = false;
+      let idx =
+        this.getLikeMusicIds &&
+        this.getLikeMusicIds.length > 0 &&
+        this.getLikeMusicIds.indexOf(row.id);
+      let arr = this.getLikeMusicIds || [];
+
       this.$api.musicData
         .setLikeMusic({
           id: row.id,
           like: !status
         })
-        .then(({ data }) => {
-          this.getUserLikelist({ uid: 397132873 }).then(data => {
-            console.log(data.ids);
-
-            // this.$store.commit("GET_USER_LIKE_LIST", data.ids);
-          });
-          console.log(data);
+        .then(() => {
+          if (!status) {
+            arr.push(row.id);
+            this.$toasted.show("已添加到我喜欢的音乐");
+          } else {
+            arr.splice(idx, 1);
+            this.$toasted.show("取消喜欢成功");
+          }
+          this.$store.commit("SET_USER_LIKE_LIST", arr);
+          this.isClickLike = true;
         });
     },
     getPlayStatus(row) {

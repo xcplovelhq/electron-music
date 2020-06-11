@@ -11,8 +11,10 @@ const state = {
   playLyric: getStorage("playLyric") || {}, // 歌词
   isPlay: false, // 是否播放
   isNext: false, // 是否下一首
+  isEnd: false, // 是否接受
   volume: getStorage("volume") || 1, // 音量
   loop: getStorage("loop") || "order", // 播放模式
+  slider: 0, // 进度条
   currentTime: "", //播放进度
   duration: "", //播放时长
   isShowLyric: getStorage("isShowLyric"), //显示歌词
@@ -58,6 +60,9 @@ const mutations = {
   SET_ISNEXT(state, data) {
     state.isNext = data;
   },
+  SET_ISEND(state, data) {
+    state.isEnd = data;
+  },
   SET_VOLUME(state, data) {
     storage("volume", data);
     state.volume = data;
@@ -75,6 +80,9 @@ const mutations = {
   },
   SET_DURATION(state, data) {
     state.duration = data;
+  },
+  SET_SLIDER(state, data) {
+    state.slider = data;
   },
   SET_CURRENT_TIME(state, data) {
     state.currentTime = data;
@@ -102,8 +110,6 @@ const actions = {
     }
   },
   async getLyric({ commit }, payload) {
-    console.log(payload);
-
     let { data } = await api.musicData.getLyric(payload);
     if (data.code === 200) {
       if (payload.type === "FM") {

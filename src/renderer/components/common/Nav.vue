@@ -1,7 +1,7 @@
 <template>
   <div class="g-nav">
-    <div class="g-avata" @click="handleLogin">
-      <div class="m-avata" @click="handleDetails">
+    <div class="g-avata" @click.stop="handleLogin">
+      <div class="m-avata" @click.stop="handleDetails">
         <img :src="user.avatarUrl" />
       </div>
       <div class="m-name">
@@ -157,13 +157,16 @@ export default {
     };
   },
   created() {
+    // this.getUserLikelist({
+    //   uid: this.$store.state.User.userInfo.userId
+    // });
     ipcRenderer.on("setUserInfoData", () => {
       if (getStorage("userInfo")) {
         this.$store.commit("SET_USER_INFO", getStorage("userInfo"));
         this.getUserLikelist({
           uid: this.$store.state.User.userInfo.userId
         }).then(data => {
-          this.$store.commit("GET_USER_LIKE_LIST", data.ids);
+          this.$store.commit("SET_USER_LIKE_LIST", data.ids);
         });
         this.getUserPlaylist({
           uid: this.$store.state.User.userInfo.userId
@@ -196,10 +199,15 @@ export default {
       // console.log(getStorage("userInfo"), 1111111111111);
     },
     handleDetails() {
-      this.$router.push({
-        name: "userDetails",
-        query: { id: this.user.userId }
-      });
+      // if (getStorage("userInfo")) {
+      //   console.log("321");
+      //   this.$router.push({
+      //     name: "userDetails",
+      //     query: { id: this.user.userId }
+      //   });
+      // } else {
+      //   ipcRenderer.send("openWin");
+      // }
     }
   }
 };

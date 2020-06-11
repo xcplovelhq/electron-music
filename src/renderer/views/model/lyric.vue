@@ -16,7 +16,7 @@ export default {
     Lyric
   },
   methods: {
-    handleClose() {
+    handleClose () {
       ipcRenderer.send("setLyric", false);
       this.$store.commit(
         "SET_ISSHOWLYRIC",

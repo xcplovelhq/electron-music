@@ -12,8 +12,8 @@ const loginCellphone = async function(data) {
 // 获取私人FM
 const getPersonalFm = async function(data) {
   const res = await axios.get({
-    // url: "/personal_fm?timestamp=" + new Date().getTime(),
-    url: "/personal_fm",
+    url: "/personal_fm?timestamp=" + new Date().getTime(),
+    // url: "/personal_fm",
     data
   });
   return res;
@@ -47,7 +47,7 @@ const getUserPlaylist = async function(data) {
 // 获取用户喜欢音乐列表
 const getUserLikelist = async function(data) {
   const res = await axios.get({
-    url: "/likelist",
+    url: "/likelist?timestamp=" + new Date().getTime(),
     data
   });
   return res;
@@ -157,10 +157,26 @@ const getEvent = async function(data) {
   });
   return res;
 };
+// 发送评论
+const setComment = async function(data) {
+  const res = await axios.get({
+    url: "/comment?timestamp=" + new Date().getTime(),
+    data
+  });
+  return res;
+};
 // 获取动态评论
 const getCommentEvent = async function(data) {
   const res = await axios.get({
-    url: "/comment/event",
+    url: "/comment/event?timestamp=" + new Date().getTime(),
+    data
+  });
+  return res;
+};
+// 给评论点赞
+const setCommentLike = async function(data) {
+  const res = await axios.get({
+    url: "/comment/like?timestamp=" + new Date().getTime(),
     data
   });
   return res;
@@ -194,5 +210,7 @@ export default {
   getUserEvent,
   getEvent,
   getCommentEvent,
-  getHotTopic
+  getHotTopic,
+  setCommentLike,
+  setComment
 };

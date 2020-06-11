@@ -1,7 +1,7 @@
 <template>
   <div class="g-dynamic">
     <div class="m-img">
-      <Avata :ImgUrl="item.user.avatarUrl" Size="35"></Avata>
+      <Avata :ImgUrl="item.user.avatarUrl" Size="40"></Avata>
     </div>
     <div class="m-info">
       <div class="m-name">
@@ -160,11 +160,21 @@
         </div>
       </div>
       <div class="m-order">
-        <div class="i-zan">
-          <i class="iconfont">&#xe611;</i>{{ item.info.likedCount }}
+        <div class="i-zan" @click="handleZan">
+          <i class="iconfont" :class="{ active: item.info.liked }">&#xe611;</i
+          >{{ item.info.likedCount }}
         </div>
         <div><i class="iconfont">&#xe60c;</i>{{ item.info.shareCount }}</div>
-        <div><i class="iconfont">&#xe620;</i>{{ item.info.commentCount }}</div>
+        <div @click="handleComment">
+          <i class="iconfont">&#xe620;</i>{{ item.info.commentCount }}
+        </div>
+      </div>
+      <div class="m-momment" v-if="isShowComment">
+        <comment-list
+          type="dynamic"
+          :id="item.info.threadId"
+          class="m-comment"
+        ></comment-list>
       </div>
     </div>
   </div>
@@ -177,24 +187,27 @@ import ShareBox from "./share";
 import Pics from "./pics";
 import MyVideo from "@/components/Video";
 import { getSum } from "@/lib/utils";
+import CommentList from "@/components/CommentList";
 
 export default {
   components: {
     Avata,
     ShareBox,
     Pics,
-    MyVideo
+    MyVideo,
+    CommentList
   },
   props: {
     item: Object,
     index: Number
   },
-  data() {
+  data () {
     return {
       limit: 10,
       offset: 0,
       loading: false,
       isLoading: false,
+      isShowComment: false,
       list: [],
       topicList: [],
       lasttime: -1
@@ -202,17 +215,17 @@ export default {
   },
 
   methods: {
-    getSumData(time) {
+    getSumData (time) {
       return getSum(time);
     },
-    getSongName(item, idx) {
+    getSongName (item, idx) {
       if (idx > 0) {
         return " / " + item.name;
       } else {
         return item.name;
       }
     },
-    getDurationms(item) {
+    getDurationms (item) {
       let startTime = this.$moment(0);
       if (item.json.mv) {
         return this.$moment(item.json.mv.duration).format("mm:ss");
@@ -224,11 +237,11 @@ export default {
         );
       }
     },
-    clickaa() {
+    clickaa () {
       ipcRenderer.send("openUrl", "http://www.baidu.com");
     },
 
-    getType(type) {
+    getType (type) {
       let text = "";
       switch (type) {
         case 13:
@@ -260,10 +273,10 @@ export default {
       }
       return text;
     },
-    getImgLoad() {
+    getImgLoad () {
       this.isLoading = false;
     },
-    getContent(row, type) {
+    getContent (row, type) {
       let msg = row.json.msg || "";
       let reg = /[\r\n]/g;
       let rep = new RegExp("#" + row.actName + "#", "g");
@@ -282,7 +295,7 @@ export default {
       msg = this.changeUrl(msg);
       return msg.replace(reg, "</br>");
     },
-    remind(s) {
+    remind (s) {
       let msg = s || "";
       if (typeof s != "string") return false;
       let reg = /@([0-9a-zA-Z\u4e00-\u9fa5]+)\s+?/g;
@@ -296,7 +309,7 @@ export default {
       }
       return msg || s;
     },
-    changeUrl(s) {
+    changeUrl (s) {
       let reg = /(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/;
       let resDtring = `<a class="m-hover" url="${s.match(reg) &&
         s.match(
@@ -305,14 +318,14 @@ export default {
       return s.replace(reg, resDtring);
     },
 
-    hanldeEnlarge(pic, row, idx, item) {
+    hanldeEnlarge (pic, row, idx, item) {
       this.isLoading = true;
       item.isShowPic = true;
       item.showPic = pic.originUrl;
       item.picIdx = idx;
     },
 
-    handleReduce(row, type) {
+    handleReduce (row, type) {
       this.isLoading = true;
       switch (type) {
         case "left":
@@ -330,19 +343,19 @@ export default {
           break;
       }
     },
-    lookEnlarge(idx) {
+    lookEnlarge (idx) {
       this.$refs.elImage[idx] && this.$refs.elImage[idx].clickHandler();
     },
-    handleRetract(row) {
+    handleRetract (row) {
       row.isShowPic = false;
       row.isShowMv = false;
     },
-    handleOpenUrl(event) {
+    handleOpenUrl (event) {
       if (event.target.nodeName === "A") {
         ipcRenderer.send("openUrl", event.target.attributes.url.value);
       }
     },
-    handleDynamic(row) {
+    handleDynamic (row) {
       this.$router.push({
         name: "dynamicDetails",
         query: {
@@ -353,19 +366,40 @@ export default {
         }
       });
     },
-    handleMv(item) {
+    handleMv (item) {
       item.isShowMv = true;
       // item.showPic = pic.originUrl;
       // item.picIdx = idx;
     },
-    handleMvTitle(row) {
+    handleMvTitle (row) {
       this.$router.push({
         name: "mvDetails",
         query: { id: row.json.mv.id, type: row.type === 21 ? "mv" : "video" }
       });
     },
-    handleGoSinger(row) {
+    handleGoSinger (row) {
       this.$router.push({ name: "singerDetails", query: { id: row.id } });
+    },
+    handleZan () {
+      this.$api.userData
+        .setCommentLike({
+          type: 6,
+          cid: this.item.id,
+          threadId: this.item.info.threadId,
+          t: !this.item.info.liked ? 1 : 0
+        })
+        .then(() => {
+          if (this.item.info.liked) {
+            this.item.info.liked = false;
+            this.item.info.likedCount--;
+          } else {
+            this.item.info.liked = true;
+            this.item.info.likedCount++;
+          }
+        });
+    },
+    handleComment () {
+      this.isShowComment = !this.isShowComment;
     }
   }
 };
@@ -374,6 +408,7 @@ export default {
 <style lang="less" scoped>
 .g-dynamic {
   display: flex;
+  width: 100%;
   padding: 20px 0 0;
   border-bottom: 1px solid #f3f3f3;
   &:first-child {
@@ -628,8 +663,17 @@ export default {
         margin-right: 5px;
         font-size: 12px;
         color: #7d7c7d;
+        &.active {
+          color: @brand-color;
+        }
       }
     }
+  }
+  .m-momment {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 6px;
+    background: #f5f5f5;
   }
 }
 </style>

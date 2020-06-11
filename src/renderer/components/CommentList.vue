@@ -1,5 +1,21 @@
 <template>
   <div class="g-comment">
+    <div class="m-input-comment">
+      <el-input
+        type="textarea"
+        ref="comment"
+        placeholder="输入评论"
+        v-model="commentText"
+        maxlength="140"
+        :rows="3"
+        show-word-limit
+        resize="none"
+      >
+      </el-input>
+      <div class="flex-justify-end" style="margin-top: 10px;">
+        <el-button plain size="small" round @click="handleSend">评论</el-button>
+      </div>
+    </div>
     <Loading v-if="isLoading"></Loading>
 
     <template v-else>
@@ -8,7 +24,11 @@
       </div>
       <template v-else>
         <template v-for="item in commentList">
-          <div class="m-box" :key="item.title" v-if="item.isShow">
+          <div
+            class="m-box"
+            :key="item.title"
+            v-if="item.isShow && item.list.length > 0"
+          >
             <h3>
               {{ item.title
               }}{{ item.title === "最新评论" ? `（${total}）` : "" }}
@@ -46,12 +66,15 @@
                     <div class="m-time">
                       {{ $moment(v.time).format("M月D日 kk:mm") }}
                     </div>
-                    <div class="m-otder">
-                      <div class="i-zan">
-                        <i class="iconfont">&#xe611;</i>{{ v.likedCount }}
+                    <div class="m-order">
+                      <div class="i-zan" @click="handleZan(v)">
+                        <i class="iconfont" :class="{ active: v.liked }"
+                          >&#xe611;</i
+                        >{{ v.likedCount }}
                       </div>
-                      <div><i class="iconfont">&#xe60c;</i></div>
-                      <div><i class="iconfont">&#xe620;</i></div>
+                      <div @click="handleComment(v)">
+                        <i class="iconfont">&#xe620;</i>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -88,6 +111,11 @@ export default {
       isAllLoading: false,
       isLoading: false,
       total: 0,
+      commentText: "",
+      commentId: 0,
+      replyUser: "",
+      typeNum: 0,
+      t: 1,
       params: {
         offset: 0,
         limit: 60
@@ -108,7 +136,8 @@ export default {
   },
   props: {
     type: String,
-    random: Number
+    random: Number,
+    id: [String, Number]
   },
   created() {
     this.getData(1);
@@ -118,21 +147,32 @@ export default {
     getData(row) {
       switch (this.type) {
         case "songSheet":
+          this.typeNum = 0;
           this.getCommentPlaylist(row);
           break;
         case "album":
+          this.typeNum = 2;
+
           this.getCommentAlbum(row);
           break;
         case "playing":
+          this.typeNum = 0;
+
           this.getCommentMusic(row);
           break;
         case "video":
+          this.typeNum = 5;
+
           this.getCommentVideo(row);
           break;
         case "mv":
+          this.typeNum = 1;
+
           this.getCommentMv(row);
           break;
         case "dynamic":
+          this.typeNum = 6;
+          this.isLoading = true;
           this.getCommentEvent(row);
           break;
         default:
@@ -142,6 +182,50 @@ export default {
     handleChange(row) {
       this.params.offset = row;
       this.getData(row);
+    },
+    handleSend() {
+      let commentId = null;
+      this.t = 1;
+      if (this.commentText.indexOf(this.replyUser) >= 0) {
+        commentId = this.commentId;
+        this.t = 2;
+      }
+      this.$api.userData
+        .setComment({
+          t: this.t,
+          type: this.typeNum,
+          content: this.commentText,
+          commentId: commentId,
+          threadId: this.id || this.$route.query.id
+        })
+        .then(() => {
+          this.getData(1);
+          this.$toasted.show("评论成功");
+        });
+    },
+    handleZan(item) {
+      this.$api.userData
+        .setCommentLike({
+          type: 6,
+          cid: item.commentId,
+          threadId: this.id || this.$route.query.id,
+          t: !item.liked ? 1 : 0
+        })
+        .then(() => {
+          if (item.liked) {
+            item.liked = false;
+            item.likedCount--;
+          } else {
+            item.liked = true;
+            item.likedCount++;
+          }
+        });
+    },
+    handleComment(item) {
+      this.replyUser = `回复${item.user.nickname}：`;
+      this.commentText = this.replyUser;
+      this.commentId = item.commentId;
+      this.$refs.comment.focus();
     },
     getCommentPlaylist(offset) {
       let hotC = this.commentList[0];
@@ -270,7 +354,7 @@ export default {
     getCommentEvent() {
       let hotC = this.commentList[0];
       let newC = this.commentList[1];
-      this.isLoading = true;
+
       newC.list = [];
       hotC.list = [];
       if (this.params.offset > 1) {
@@ -280,7 +364,7 @@ export default {
       }
       this.$api.userData
         .getCommentEvent({
-          threadId: this.$route.query.id
+          threadId: this.id || this.$route.query.id
         })
         .then(({ data }) => {
           this.total = data.total;
@@ -347,7 +431,7 @@ export default {
           font-size: 12px;
           color: #d7d7d7;
         }
-        .m-otder {
+        .m-order {
           display: flex;
           font-size: 12px;
           color: #939393;
@@ -366,6 +450,9 @@ export default {
           .iconfont {
             font-size: 12px;
             color: #7d7c7d;
+            &.active {
+              color: @brand-color;
+            }
           }
         }
       }

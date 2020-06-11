@@ -5,71 +5,6 @@
       <div class="g-warper">
         <div class="m-details">
           <div class="m-back"><i class="iconfont">&#xe617;</i>视频详情</div>
-          <!-- <div
-            class="m-video"
-            ref="videoContainer"
-            :class="{ 'm-isfull': isFull }"
-          >
-            <video
-              :src="videoUrl"
-              ref="video"
-              @dblclick="handleFull"
-              @durationchange="getDuration"
-              @timeupdate="getTimeupdate"
-              @ended="getEnded"
-              @click="hanldePlay"
-              playsinline=""
-              webkit-playsinline=""
-              preload="auto"
-            ></video>
-            <div class="m-play" v-if="!isPlay" @click="hanldePlay">
-              <img src="../../assets/play.png" />
-            </div>
-            <div class="m-controls">
-              <div class="m-time">
-                <span>{{ $moment(currentTime * 1000).format("mm:ss") }}</span>
-                <span> / {{ $moment(duration * 1000).format("mm:ss") }}</span>
-              </div>
-              <div class="m-order">
-                <el-popover
-                  popper-class="m-mv-pop"
-                  ref="popover"
-                  placement="top"
-                  :visible-arrow="false"
-                  width="30"
-                  trigger="hover"
-                  content=""
-                >
-                  <el-slider
-                    v-model="volume"
-                    :min="0"
-                    :max="1"
-                    :step="0.01"
-                    vertical
-                    height="80px"
-                    class="m-volume-slider"
-                    :show-tooltip="false"
-                    @input="handleVolume"
-                  ></el-slider>
-                </el-popover>
-                <div class="m-volume" v-popover:popover @click="handleMute">
-                  <i class="iconfont">&#xe87a;</i>
-                </div>
-                <div class="m-full" @click="handleFull">
-                  <i v-if="isFull" class="iconfont">&#xe790;</i>
-                  <i v-else class="iconfont">&#xe638;</i>
-                </div>
-              </div>
-            </div>
-            <div class="m-slider">
-              <el-slider
-                v-model="currentTime"
-                @change="handleChange"
-                :max="duration"
-                :show-tooltip="false"
-              ></el-slider>
-            </div>
-          </div> -->
           <my-video :id="$route.query.id" :type="$route.query.type"></my-video>
           <div class="m-name">
             <div class="m-username">
@@ -138,134 +73,80 @@ import CommentList from "@/components/CommentList";
 import MyVideo from "@/components/Video";
 
 export default {
+  name: "mv-details",
   components: { GHeader, MvImage, Avata, CommentList, MyVideo },
-  data() {
+  data () {
     return {
       info: {},
       isFull: false,
-      volume: 1,
-      duration: 0,
-      currentTime: 0,
-      isPlay: false,
-      video: null,
-      videoUrl: "",
       mvList: []
     };
   },
-  created() {
-    if (this.$route.query.type === "video") {
-      this.getVideoDetail();
-      this.getVideoUrl();
-      this.getRelatedAllvideo();
-    } else {
-      this.getData();
-      this.getSimiMv();
-      this.getMvUrl();
-    }
+  created () {
+    this.getData();
   },
-  mounted() {
-    this.video = this.$refs.video;
-    this.volume = this.$store.state.Play.volume;
-  },
+  mounted () { },
   methods: {
-    getDuration(e) {
-      this.duration = e.target.duration;
-    },
-    getTimeupdate(e) {
-      this.currentTime = e.target.currentTime;
-    },
-    getEnded(e) {
-      console.log(e);
-    },
-    hanldePlay() {
-      setTimeout(() => {
-        if (this.isPlay) {
-          this.video.pause();
-        } else {
-          this.video.play();
-        }
-        this.isPlay = !this.isPlay;
-      }, 300);
-    },
-    handleChange() {
-      this.video.currentTime = this.currentTime;
-    },
-    handleVolume() {
-      this.video.volume = this.volume;
-    },
-    handleMute() {
-      if (this.volume) {
-        this.volume = 0;
-      } else {
-        this.volume = 1;
-      }
-    },
-    handleFull() {
-      if (this.isFull) {
-        document.webkitCancelFullScreen();
-      } else {
-        this.$refs.videoContainer.webkitRequestFullScreen();
-      }
-      this.isFull = !this.isFull;
-    },
-
-    getVideoDetail() {
+    getVideoDetail () {
       this.$api.videoData
         .getVideoDetail({
           id: this.$route.query.id
         })
         .then(({ data }) => {
           this.info = data.data;
-          console.log(data);
         });
     },
-    getVideoUrl() {
-      this.$api.videoData
-        .getVideoUrl({
-          id: this.$route.query.id
-        })
-        .then(({ data }) => {
-          this.videoUrl = data.urls[0].url;
-        });
-    },
-    getRelatedAllvideo() {
+    getRelatedAllvideo () {
       this.$api.videoData
         .getRelatedAllvideo({
           id: this.$route.query.id
         })
         .then(({ data }) => {
           this.mvList = data.data;
+          if (this.mvList && this.mvList.length > 0) {
+            this.$store.commit("SET_VIDEO_INFO", data.data[0]);
+          }
         });
     },
 
-    getData() {
+    getMvDetails () {
       this.$api.videoData
         .getMvDetails({
           mvid: this.$route.query.id
         })
         .then(({ data }) => {
           this.info = data.data;
-          console.log(data);
         });
     },
-    getMvUrl() {
-      this.$api.videoData
-        .getMvUrl({
-          id: this.$route.query.id
-        })
-        .then(({ data }) => {
-          this.videoUrl = data.data.url;
-        });
-    },
-    getSimiMv() {
+    getSimiMv () {
       this.$api.videoData
         .getSimiMv({
           mvid: this.$route.query.id
         })
         .then(({ data }) => {
           this.mvList = data.mvs;
-          console.log(data);
+          if (this.mvList && this.mvList.length > 0) {
+            this.$store.commit("SET_VIDEO_INFO", data.mvs[0]);
+          }
         });
+    },
+    getData () {
+      if (this.$route.query.type === "video") {
+        this.getVideoDetail();
+        this.getRelatedAllvideo();
+      } else {
+        this.getMvDetails();
+        this.getSimiMv();
+      }
+    }
+  },
+  watch: {
+    $route (to, from) {
+      if (to.name === from.name) {
+        this.getData();
+      }
+
+      // 对路由变化作出响应...
     }
   }
 };

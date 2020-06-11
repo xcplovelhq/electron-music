@@ -96,11 +96,6 @@ export default {
         })
         .then(({ data }) => {
           console.log(data);
-
-          // this.getUserLikelist({ uid: 397132873 }).then(data => {
-          //   console.log(data);
-          //   // this.$store.commit("GET_USER_LIKE_LIST", data.ids);
-          // });
         });
     },
     getSongName(item, idx) {

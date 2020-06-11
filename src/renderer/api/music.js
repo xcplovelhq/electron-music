@@ -19,7 +19,7 @@ const getTopSong = async function(data) {
 // 喜欢音乐
 const setLikeMusic = async function(data) {
   const res = await axios.get({
-    url: "/like",
+    url: "/like?timestamp=" + new Date().getTime(),
     data
   });
   return res;

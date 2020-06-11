@@ -106,7 +106,8 @@ export default {
         "boutique-song",
         "singer",
         "singer-details",
-        "typeList"
+        "typeList",
+        "mv-details"
       ]
     };
   },
@@ -120,7 +121,6 @@ export default {
         this.$router.back();
       }
     });
-    // deleteStorage("playList");
   },
   mounted() {},
   computed: {

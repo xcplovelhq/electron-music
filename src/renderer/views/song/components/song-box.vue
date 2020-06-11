@@ -18,7 +18,6 @@
 // import Moment from "moment";
 import Loading from "@/components/Loading";
 // import { getStorage } from "@/lib/store";
-import { mapActions } from "vuex";
 import SongList from "@/components/SongList";
 
 export default {
@@ -56,74 +55,7 @@ export default {
     };
   },
   created() {},
-  methods: {
-    ...mapActions(["getUserLikelist", "getSongUrl"])
-    // getIsLike (row) {
-    //   return (
-    //     this.$store.state.User.likeMusicIds &&
-    //     this.$store.state.User.likeMusicIds.includes(row.id)
-    //   );
-    // },
-    // handleClick (row) {
-    //   this.id = row.id;
-    // },
-    // handledbClick (row) {
-    //   this.$store.commit("SET_PLAY_INFO", row);
-    //   if (
-    //     getStorage("playDetails") &&
-    //     getStorage("playDetails").id !== this.details.id
-    //   ) {
-    //     this.getSongUrl({
-    //       id: this.details.tracks.map(item => item.id)
-    //     });
-    //   }
-    //   this.$store.commit("SET_PLAY_DETAILS", this.details);
-    //   this.$store.commit("SET_ISPLAY", true);
-    // },
-    // handleLike (status, row) {
-    //   this.$api.musicData
-    //     .setLikeMusic({
-    //       id: row.id,
-    //       like: !status
-    //     })
-    //     .then(({ data }) => {
-    //       this.getUserLikelist({ uid: 397132873 }).then(data => {
-    //         console.log(data.ids);
-
-    //         // this.$store.commit("GET_USER_LIKE_LIST", data.ids);
-    //       });
-    //       console.log(data);
-    //     });
-    //   console.log(status);
-    // },
-    // getPlayStatus (row) {
-    //   if (
-    //     this.$store.state.Play.playInfo &&
-    //     row.id === this.$store.state.Play.playInfo.id
-    //   ) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // },
-    // getSongName (item, idx) {
-    //   if (idx > 0) {
-    //     return " / " + item.name;
-    //   } else {
-    //     return item.name;
-    //   }
-    // },
-    // getSum (idx) {
-    //   if (idx < 10) {
-    //     return "0" + idx;
-    //   } else {
-    //     return idx;
-    //   }
-    // },
-    // getTime (row) {
-    //   return Moment(row.dt).format("mm:ss");
-    // }
-  }
+  methods: {}
 };
 </script>
 

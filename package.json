@@ -21,7 +21,7 @@
     "electron-debug": "^3.0.1",
     "electron-promise-ipc": "^2.1.0",
     "element-ui": "^2.4.5",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "scrollreveal": "^4.0.6",
     "swiper": "^5.3.6",
     "vue": "^2.6.11",
